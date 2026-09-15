@@ -1,0 +1,15 @@
+---
+title: "LAB-01 · 지역별 만족도, 평균만 비교하면 충분할까? — 교수 검토용 기준 보고서"
+format: html
+lang: ko
+execute:
+  echo: false
+---
+
+```{r}
+source("analysis.R")
+```
+
+![실제 R 실행 결과](output/distributions.png)
+
+{{< include README.md >}}
