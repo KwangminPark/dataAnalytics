@@ -1,0 +1,119 @@
+<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width"><title>LAB-02 · 집단별 매출 차이, 90행을 독립 표본으로 봐도 될까? · 외식빅데이터애널리틱스</title><meta name="description" content="질문에서 데이터 분석, 해석과 작업 기록까지 이어지는 수업 실습"><style>:root{color:#18342e;background:#faf9f5;font-family:system-ui,-apple-system,Segoe UI,sans-serif;font-size:16px;line-height:1.75}*{box-sizing:border-box}body{margin:0}a{color:#075f52;text-underline-offset:4px}a:hover{color:#a24d22}header{background:#fff;border-bottom:1px solid #d8ded5;justify-content:space-between;align-items:center;gap:2rem;padding:1.2rem max(5vw,1rem);display:flex}nav{flex-wrap:wrap;gap:1.3rem;display:flex}.brand{font-size:1.15rem;font-weight:800;text-decoration:none}main{max-width:1240px;margin:auto;padding:3rem 2rem}h1{letter-spacing:-.055em;max-width:950px;font-size:clamp(2rem,4vw,3.6rem);line-height:1.2}h2{letter-spacing:-.025em;line-height:1.4}h3{line-height:1.4}p{max-width:76ch}button,.button{font:inherit;cursor:pointer;color:#fff;background:#176654;border:1px solid #176654;border-radius:6px;padding:.55rem 1rem;text-decoration:none;display:inline-block}button:focus-visible,a:focus-visible,summary:focus-visible{outline-offset:4px;outline:3px solid #c47728}.eyebrow{letter-spacing:.12em;color:#577062;font-size:.8rem;font-weight:700}.lead{color:#526259;font-size:1.2rem}.cards{grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:1rem;display:grid}.card{color:inherit;background:#fff;border:1px solid #d8ded5;border-radius:10px;padding:1.5rem;text-decoration:none;display:block}.card:hover{border-color:#176654}.card h3{font-size:1.3rem}.layout{grid-template-columns:210px minmax(0,1fr);gap:3rem;display:grid}.steps{align-self:start;position:sticky;top:1rem}.steps a{padding:.35rem 0;display:block}.lesson section{border-top:1px solid #d8ded5;padding:1.4rem 0;scroll-margin-top:1rem}.lesson h2{font-size:1.65rem}.prose{white-space:pre-wrap;overflow-wrap:anywhere}.rich{overflow-x:auto}.rich p{white-space:normal}pre{color:#f3f6ee;tab-size:2;background:#18342e;border-radius:8px;max-width:100%;padding:1.2rem;font-size:.9rem;overflow:auto}code{font-family:ui-monospace,monospace}.file{margin:.6rem 0;display:block}.file small{color:#526259;display:block}figure{margin:1.5rem 0}img{border-radius:8px;max-width:100%;height:auto}figcaption{color:#526259;font-size:.9rem}table{border-collapse:collapse;max-width:100%;display:block;overflow:auto}th,td{border:1px solid #bcc8bd;padding:.5rem}details{background:#f0eee5;border-radius:8px;padding:1rem}summary{cursor:pointer;font-weight:650}.quiz-options{gap:.5rem;display:grid}.quiz-options button{color:#18342e;text-align:left;background:#fff}.quiz-result{font-weight:650}.skip{position:absolute;left:-9999px}.skip:focus{z-index:2;background:#fff;padding:1rem;left:1rem}footer{text-align:center;color:#526259;border-top:1px solid #d8ded5;padding:2rem;font-size:.85rem}.empty{padding:4rem 0}.home-section{margin:3rem 0}@media (width<=768px){header{flex-direction:column;align-items:flex-start;gap:.7rem}main{padding:2rem 1rem}.layout{grid-template-columns:1fr;gap:1rem}.steps{border-bottom:1px solid #d8ded5;padding-bottom:1rem;position:static}.steps a{margin-right:1rem;display:inline-block}nav{gap:.6rem 1rem;font-size:.9rem}}@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style></head><body><a class="skip" href="#main">본문으로 이동</a><header><a class="brand" href="/dataAnalytics/">외식빅데이터애널리틱스</a><nav aria-label="주 메뉴"><a href="/dataAnalytics/#lesson">수업 실습</a><a href="https://ecampus.sejong.ac.kr/course/view.php?id=33538" rel="noopener noreferrer">집현캠퍼스 · 공식 제출</a></nav></header><main id="main"><p><a href="/dataAnalytics/">← 수업 실습</a></p><h1>LAB-02 · 집단별 매출 차이, 90행을 독립 표본으로 봐도 될까?</h1><p class="lead">세 브랜드 표시의 하루 매출을 비교한다. 계산 전에 “30일씩 3집단이면 독립적인 매장 90개를 관찰한 것인가?”에 답한다. 평균 차이 계산과 일반화 가능한 경영 판단을 구분하는 것이 목표다.</p><div class="layout"><aside class="steps" aria-label="실습 단계"><a href="#step-1">분석 질문과 먼저 생각하기</a><a href="#step-2">데이터 이해</a><a href="#step-3">내 PC에서 실행하기</a><a href="#step-4">따라 하기</a><a href="#step-5">실제 R 기준 출력</a><a href="#step-6">결과 해석</a><a href="#step-7">바꿔 해보기</a><a href="#step-8">막힐 때</a><a href="#step-9">실습 파일 묶음과 보고서 틀</a><a href="#step-10">출처</a></aside><article class="lesson"><section id="step-1"><h2>분석 질문과 먼저 생각하기</h2><p class="prose">세 브랜드 표시의 하루 매출을 비교한다. 계산 전에 “30일씩 3집단이면 독립적인 매장 90개를 관찰한 것인가?”에 답한다. 평균 차이 계산과 일반화 가능한 경영 판단을 구분하는 것이 목표다.</p></section><section id="step-2"><h2>데이터 이해</h2><p class="prose">원전: 박광민, 『비즈니스 애널리틱스』 4장 4.4. https://kwangminpark.github.io/businessAnalytics/Chapter4.html
+
+`data/ch4_data.csv`는 원전 저장소 commit `c7741bed344d0f6620f2fa65de6b5256f903011a`의 교육용 자료다. 원전은 동일 지역 경쟁 매장을 설정한 수업 상황을 설명한다. 실측 여부·표집 과정·생성 시드는 확인되지 않았으므로 실제 브랜드 매출 실적이라고 주장하지 않는다. 이 패키지에서 새 관측값이나 날짜를 만들지 않았다.
+
+한 행은 브랜드 표시 하나의 하루다. 원본에 있는 2025년 6월 관측 날짜는 데이터 변수이며 **2026년도 2학기 수업 일정이 아니다**. 브랜드별 30일, 전체 90행이다. `날짜`와 `브랜드`의 조합은 중복되지 않으며 결측치는 없다. 매장 ID는 없다. 같은 매장의 반복 측정 여부와 모집단을 확정할 수 없다.
+
+변수: `날짜`(관측 일자), `브랜드`(교재의 집단 표시), `일매출`(원), `방문객수`(명), `구매고객수`(명), `평균체류시간_분`(분). 코드는 원본을 읽은 뒤 열 이름만 영문으로 바꾼다. 그림의 영문 브랜드 표시는 원본 범주에 대응한다.</p><a class="file" href="/dataAnalytics/downloads/9e38af4cda38f8d1-ch4_data.csv" download>ch4_data.csv ↓<small>5 KB · 원전의 교육용 자료; 실측 여부·생성 시드 미확인 · https://kwangminpark.github.io/businessAnalytics/Chapter4.html</small></a></section><section id="step-3"><h2>내 PC에서 실행하기</h2><p class="prose">새 폴더에 패키지를 풀고 RStudio 프로젝트로 연 뒤 `analysis.R`를 Source한다. 또는 이 폴더에서 `Rscript --vanilla analysis.R`를 실행한다. 추가 R 패키지는 필요 없다. `output/summary.csv`, `tukey.csv`, `model-metrics.csv`, `sales-comparison.png`, `diagnostics.png`가 생성된다. 제공된 `reference-output`과 비교한다.</p></section><section id="step-4"><h2>따라 하기</h2><button type="button" class="copy-code">코드 복사</button><pre><code># LAB-02. Textbook teaching data. Repeated store-day observations are not independent stores.
+# Run in this package directory: Rscript --vanilla analysis.R
+options(digits = 7)
+raw &lt;- read.csv(&quot;data/ch4_data.csv&quot;, fileEncoding = &quot;UTF-8&quot;, check.names = FALSE)
+expected &lt;- c(&quot;날짜&quot;, &quot;브랜드&quot;, &quot;일매출&quot;, &quot;방문객수&quot;, &quot;구매고객수&quot;, &quot;평균체류시간_분&quot;)
+stopifnot(identical(names(raw), expected), nrow(raw) == 90, !anyNA(raw))
+names(raw) &lt;- c(&quot;date&quot;, &quot;brand&quot;, &quot;sales&quot;, &quot;visitors&quot;, &quot;buyers&quot;, &quot;minutes&quot;)
+raw$date &lt;- as.Date(raw$date)
+brand_names &lt;- c(&quot;스타벅스&quot;, &quot;컴포즈커피&quot;, &quot;메가커피&quot;)
+raw$brand &lt;- factor(raw$brand, levels = brand_names, labels = c(&quot;Starbucks&quot;, &quot;Compose&quot;, &quot;Mega&quot;))
+stopifnot(!anyNA(raw), !anyDuplicated(raw[c(&quot;date&quot;, &quot;brand&quot;)]),
+          all(raw$sales &gt; 0), all(raw$buyers &lt;= raw$visitors), all(table(raw$brand) == 30))
+dir.create(&quot;output&quot;, showWarnings = FALSE)
+summary_table &lt;- do.call(rbind, lapply(levels(raw$brand), function(b) {
+  x &lt;- raw$sales[raw$brand == b]
+  data.frame(brand = b, n_days = length(x), mean_won = mean(x), median_won = median(x), sd_won = sd(x))
+}))
+# This one-way model is a teaching comparison conditional on independence assumptions.
+fit &lt;- aov(sales ~ brand, data = raw)
+tukey &lt;- TukeyHSD(fit, &quot;brand&quot;)$brand
+welch &lt;- oneway.test(sales ~ brand, data = raw, var.equal = FALSE)
+# Same-date blocks address shared dates, but do not remove within-store serial correlation.
+blocked &lt;- lm(sales ~ factor(date) + brand, data = raw)
+null_blocked &lt;- lm(sales ~ factor(date), data = raw)
+block_comparison &lt;- anova(null_blocked, blocked)
+serial &lt;- sapply(split(raw, raw$brand), function(group) {
+  group &lt;- group[order(group$date), ]
+  cor(head(group$sales, -1), tail(group$sales, -1))
+})
+write.csv(summary_table, &quot;output/summary.csv&quot;, row.names = FALSE)
+write.csv(data.frame(comparison = rownames(tukey), tukey, row.names = NULL), &quot;output/tukey.csv&quot;, row.names = FALSE)
+write.csv(data.frame(test = c(&quot;one_way_F&quot;, &quot;one_way_p&quot;, &quot;welch_F&quot;, &quot;welch_p&quot;, &quot;date_block_F&quot;, &quot;date_block_p&quot;),
+                     value = c(summary(fit)[[1]][1,&quot;F value&quot;], summary(fit)[[1]][1,&quot;Pr(&gt;F)&quot;],
+                               unname(welch$statistic), welch$p.value, block_comparison[2,&quot;F&quot;], block_comparison[2,&quot;Pr(&gt;F)&quot;])),
+          &quot;output/model-metrics.csv&quot;, row.names = FALSE)
+png(&quot;output/sales-comparison.png&quot;, width = 1400, height = 680, res = 140)
+par(mfrow = c(1, 2), mar = c(5, 5, 3, 1))
+boxplot(sales/1000000 ~ brand, raw, col = c(&quot;#8bb89c&quot;, &quot;#e1ca83&quot;, &quot;#98b7c6&quot;),
+        xlab = &quot;Textbook brand label&quot;, ylab = &quot;Daily sales (million KRW)&quot;, main = &quot;30 days per label, not 30 stores&quot;)
+wide &lt;- reshape(raw[c(&quot;date&quot;, &quot;brand&quot;, &quot;sales&quot;)], idvar = &quot;date&quot;, timevar = &quot;brand&quot;, direction = &quot;wide&quot;)
+wide &lt;- wide[order(wide$date), ]
+matplot(wide$date, as.matrix(wide[-1])/1000000, type = &quot;l&quot;, lty = 1,
+        col = c(&quot;#24654e&quot;, &quot;#946300&quot;, &quot;#2c6985&quot;), xlab = &quot;Date&quot;, ylab = &quot;Sales (million KRW)&quot;, main = &quot;Repeated daily measurements&quot;)
+legend(&quot;topright&quot;, levels(raw$brand), col = c(&quot;#24654e&quot;, &quot;#946300&quot;, &quot;#2c6985&quot;), lty = 1, bty = &quot;n&quot;, cex = .75)
+dev.off()
+png(&quot;output/diagnostics.png&quot;, width = 1200, height = 600, res = 130)
+par(mfrow = c(1, 2)); plot(fit, which = 1); plot(fit, which = 2); dev.off()
+capture.output({cat(&quot;LAB-02: textbook teaching data, provenance does not establish real brand performance\n&quot;);
+  print(summary_table); print(summary(fit)); print(tukey); print(welch); print(block_comparison);
+  cat(&quot;\nFligner variance check (does not verify independence):\n&quot;); print(fligner.test(sales ~ brand, raw));
+  cat(&quot;\nWithin-label lag-1 sample correlations:\n&quot;); print(serial);
+  cat(&quot;\nNo store identifier or sampling design: do not generalize to brand populations.\n&quot;)}, file = &quot;output/results.txt&quot;)
+capture.output(sessionInfo(), file = &quot;output/session-info.txt&quot;)
+cat(readLines(&quot;output/results.txt&quot;), sep = &quot;\n&quot;)
+</code></pre><a class="file" href="/dataAnalytics/downloads/486a611e3d00276b-analysis.R" download>analysis.R ↓<small>4 KB · 원전의 교육용 자료; 실측 여부·생성 시드 미확인 · https://kwangminpark.github.io/businessAnalytics/Chapter4.html</small></a></section><section id="step-5"><h2>실제 R 기준 출력</h2><p class="prose">LAB-02: textbook teaching data, provenance does not establish real brand performance
+      brand n_days  mean_won median_won    sd_won
+1 Starbucks     30 1677475.3    1677892 122632.85
+2   Compose     30  909886.9     914381  77857.45
+3      Mega     30 1186152.9    1180720 116788.48
+            Df    Sum Sq   Mean Sq F value Pr(&gt;F)    
+brand        2 9.069e+12 4.535e+12   391.6 &lt;2e-16 ***
+Residuals   87 1.007e+12 1.158e+10                   
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+                       diff       lwr       upr        p adj
+Compose-Starbucks -767588.4 -833841.0 -701335.7 3.090042e-10
+Mega-Starbucks    -491322.4 -557575.0 -425069.7 3.090042e-10
+Mega-Compose       276266.0  210013.4  342518.6 3.090319e-10
+
+	One-way analysis of means (not assuming equal variances)
+
+data:  sales and brand
+F = 416.42, num df = 2.0, denom df = 55.3, p-value &lt; 2.2e-16
+
+Analysis of Variance Table
+
+Model 1: sales ~ factor(date)
+Model 2: sales ~ factor(date) + brand
+  Res.Df        RSS Df  Sum of Sq      F    Pr(&gt;F)    
+1     60 9.6271e+12                                   
+2     58 5.5794e+11  2 9.0691e+12 471.38 &lt; 2.2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Fligner variance check (does not verify independence):
+
+	Fligner-Killeen test of homogeneity of variances
+
+data:  sales by brand
+Fligner-Killeen:med chi-squared = 2.748, df = 2, p-value = 0.2531
+
+
+Within-label lag-1 sample correlations:
+   Starbucks      Compose         Mega 
+ 0.006943587 -0.248737260  0.516055331 
+
+No store identifier or sampling design: do not generalize to brand populations.
+</p><figure><img src="/dataAnalytics/downloads/35921e5fe23301d0-sales-comparison.png" alt="실제 R 기준 출력"><figcaption>원전의 교육용 자료; 실측 여부·생성 시드 미확인 · https://kwangminpark.github.io/businessAnalytics/Chapter4.html</figcaption></figure><a class="file" href="/dataAnalytics/downloads/35921e5fe23301d0-sales-comparison.png" download>sales-comparison.png ↓<small>103 KB · 원전의 교육용 자료; 실측 여부·생성 시드 미확인 · https://kwangminpark.github.io/businessAnalytics/Chapter4.html</small></a><figure><img src="/dataAnalytics/downloads/1d773bb48aa08f67-diagnostics.png" alt="실제 R 기준 출력"><figcaption>원전의 교육용 자료; 실측 여부·생성 시드 미확인 · https://kwangminpark.github.io/businessAnalytics/Chapter4.html</figcaption></figure><a class="file" href="/dataAnalytics/downloads/1d773bb48aa08f67-diagnostics.png" download>diagnostics.png ↓<small>77 KB · 원전의 교육용 자료; 실측 여부·생성 시드 미확인 · https://kwangminpark.github.io/businessAnalytics/Chapter4.html</small></a><a class="file" href="/dataAnalytics/downloads/5276bec1d122a3d6-tukey.csv" download>tukey.csv ↓<small>1 KB · 원전의 교육용 자료; 실측 여부·생성 시드 미확인 · https://kwangminpark.github.io/businessAnalytics/Chapter4.html</small></a><a class="file" href="/dataAnalytics/downloads/cec8586cf985db26-session-info.txt" download>session-info.txt ↓<small>1 KB · 원전의 교육용 자료; 실측 여부·생성 시드 미확인 · https://kwangminpark.github.io/businessAnalytics/Chapter4.html</small></a><a class="file" href="/dataAnalytics/downloads/3480cc48cf44e1f6-model-metrics.csv" download>model-metrics.csv ↓<small>1 KB · 원전의 교육용 자료; 실측 여부·생성 시드 미확인 · https://kwangminpark.github.io/businessAnalytics/Chapter4.html</small></a><a class="file" href="/dataAnalytics/downloads/82b31ee4f65b1416-summary.csv" download>summary.csv ↓<small>1 KB · 원전의 교육용 자료; 실측 여부·생성 시드 미확인 · https://kwangminpark.github.io/businessAnalytics/Chapter4.html</small></a></section><section id="step-6"><h2>결과 해석</h2><p class="prose">| 교재 표시 | 일수 | 평균 일매출(원) | 표준편차(원) |
+|---|---:|---:|---:|
+| Starbucks | 30 | 1,677,475.30 | 122,632.85 |
+| Compose | 30 | 909,886.93 | 77,857.45 |
+| Mega | 30 | 1,186,152.93 | 116,788.48 |
+
+일원분산분석과 Tukey 사후 비교는 독립성 등 모형 조건을 가정한 교육용 계산이다. 상자그림, 잔차-적합값 그림, Q-Q 그림과 집단별 분산을 함께 확인한다. Fligner 검정이 유의하지 않더라도 독립성이 입증되지는 않는다. Welch 분석은 분산이 같은지에 대한 가정을 완화하지만 반복 관측 문제를 해결하지 않는다.
+
+`sales ~ factor(date) + brand`는 같은 날짜의 공통 변동을 통제하는 보조 비교다. 이 모형 역시 매장 내 시계열 상관을 자동으로 해결하지 않는다. 예를 들어 Mega 표시의 일매출 지연 1 상관은 약 0.516으로 계산된다. 짧은 시계열의 표본 상관만으로 생성 과정을 확정할 수 없지만, 행 간 독립성을 당연시해서는 안 된다는 점을 확인할 수 있다.
+
+적절한 결론: “제공된 교재 데이터에서는 세 표시의 평균 일매출이 다르다. 모형의 검정 결과는 가정에 의존하며 실제 브랜드 전체로 일반화할 근거가 없다.” 부적절한 결론: “이 결과로 특정 브랜드에 투자해야 한다.” 실제 의사결정에는 매장 수, 규모·입지·영업시간, 표집 설계, 비용과 반복 관측 처리가 추가로 필요하다.</p></section><section id="step-7"><h2>바꿔 해보기</h2><p class="prose">1. `일매출 / 구매고객수`를 만들어 매출 순위와 구매 고객당 금액 순위를 비교한다. 분모가 0인지 먼저 검사한다.
+2. 일원모형과 날짜 블록 모형의 결과를 비교하되 “문제가 해결됐다”라고 단정하지 않는다.
+3. 실제 브랜드 수준 비교를 설계한다면 필요한 매장 ID·반복 기간·입지 변수를 목록으로 작성한다.</p></section><section id="step-8"><h2>막힐 때</h2><details><summary>오류와 확인 순서 펼치기</summary><p class="prose">한글 열이 깨지면 UTF-8 원본인지 확인하고, 다른 프로그램으로 다시 저장한 파일 대신 제공 CSV를 사용한다. `contrasts can be applied only to factors with 2 or more levels`가 나오면 필터 후 집단이 하나만 남았는지 `table(raw$brand)`로 확인한다. 행 수가 다르면 파일·날짜 범위·필터·결측치 순서로 확인한다.
+
+보고서에는 요약표, 비교 그래프, 모형 결과, 가정 점검, 일반화 한계, 추가 수집 계획을 넣는다. 자신이 실행한 코드와 보고서를 비공개 GitHub 프로젝트에 기록한다. 공식 제출은 집현캠퍼스 안내를 따른다. 마감·배점은 아직 등록하지 않았다.</p></details></section><section id="step-9"><h2>실습 파일 묶음과 보고서 틀</h2><p class="prose">실행 코드·데이터·기준 출력·해설·보고서 틀을 함께 받으세요. 공식 제출은 집현캠퍼스 안내를 따릅니다. 강의 일정과 LMS 주소는 아직 미등록입니다.</p><a class="file" href="/dataAnalytics/downloads/eb9b4e97cf2c12b2-lab-02.zip" download>lab-02.zip ↓<small>183 KB · 원전의 교육용 자료; 실측 여부·생성 시드 미확인 · https://kwangminpark.github.io/businessAnalytics/Chapter4.html</small></a><a class="file" href="/dataAnalytics/downloads/8da88ce49017f55f-report-template.qmd" download>report-template.qmd ↓<small>1 KB · 원전의 교육용 자료; 실측 여부·생성 시드 미확인 · https://kwangminpark.github.io/businessAnalytics/Chapter4.html</small></a><a class="file" href="/dataAnalytics/downloads/b2454518060fd50a-reference-report.qmd" download>reference-report.qmd ↓<small>1 KB · 원전의 교육용 자료; 실측 여부·생성 시드 미확인 · https://kwangminpark.github.io/businessAnalytics/Chapter4.html</small></a><a class="file" href="/dataAnalytics/downloads/8b1edb252a1eda13-README.md" download>README.md ↓<small>5 KB · 원전의 교육용 자료; 실측 여부·생성 시드 미확인 · https://kwangminpark.github.io/businessAnalytics/Chapter4.html</small></a></section><section id="step-10"><h2>출처</h2><p class="prose">원전의 교육용 자료; 실측 여부·생성 시드 미확인 · https://kwangminpark.github.io/businessAnalytics/Chapter4.html</p></section><section><h2>출처와 다음 행동</h2><p><a href="https://kwangminpark.github.io/businessAnalytics/Chapter4.html" rel="noopener noreferrer">원전 교재</a></p><p><a href="https://raw.githubusercontent.com/KwangminPark/businessAnalytics/c7741bed344d0f6620f2fa65de6b5256f903011a/docs/data/ch4_data.csv" rel="noopener noreferrer">고정된 원본 데이터</a></p><p>실행한 코드와 결과, 결과를 설명하는 README를 자신의 분석 프로젝트에 기록하세요. 공식 제출은 집현캠퍼스의 안내를 따르세요.</p></section></article></div></main><footer>공식 제출·평가는 집현캠퍼스에서 진행합니다. 이 사이트의 자기점검은 학습용입니다.</footer></body></html><script type="module">document.querySelectorAll(`.copy-code`).forEach(e=>e.addEventListener(`click`,async()=>{try{await navigator.clipboard.writeText(e.nextElementSibling?.textContent||``),e.textContent=`복사됨`}catch{e.textContent=`코드를 선택해서 복사하세요`}})),document.querySelectorAll(`.quiz`).forEach(e=>e.querySelectorAll(`button`).forEach(t=>t.addEventListener(`click`,()=>{e.querySelector(`.quiz-result`).textContent=t.dataset.option===e.dataset.answer?`맞습니다. 본문의 해석과 근거를 다시 연결해 보세요.`:`다시 생각해 보세요. 본문의 조건과 해석을 확인하세요.`})));</script>
