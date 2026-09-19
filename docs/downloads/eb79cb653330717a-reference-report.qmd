@@ -1,0 +1,15 @@
+---
+title: "LAB-03 · 식사금액이 클수록 팁도 클까? — 교수 검토용 기준 보고서"
+format: html
+lang: ko
+execute:
+  echo: false
+---
+
+```{r}
+source("analysis.R")
+```
+
+![실제 R 실행 결과](output/bill-and-tip.png)
+
+{{< include README.md >}}

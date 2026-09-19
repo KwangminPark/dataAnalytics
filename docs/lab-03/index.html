@@ -1,0 +1,115 @@
+<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width"><title>LAB-03 · 식사금액이 클수록 팁도 클까? · 외식빅데이터애널리틱스</title><meta name="description" content="질문에서 데이터 분석, 해석과 작업 기록까지 이어지는 수업 실습"><style>:root{color:#18342e;background:#faf9f5;font-family:system-ui,-apple-system,Segoe UI,sans-serif;font-size:16px;line-height:1.75}*{box-sizing:border-box}body{margin:0}a{color:#075f52;text-underline-offset:4px}a:hover{color:#a24d22}header{background:#fff;border-bottom:1px solid #d8ded5;justify-content:space-between;align-items:center;gap:2rem;padding:1.2rem max(5vw,1rem);display:flex}nav{flex-wrap:wrap;gap:1.3rem;display:flex}.brand{font-size:1.15rem;font-weight:800;text-decoration:none}main{max-width:1240px;margin:auto;padding:3rem 2rem}h1{letter-spacing:-.055em;max-width:950px;font-size:clamp(2rem,4vw,3.6rem);line-height:1.2}h2{letter-spacing:-.025em;line-height:1.4}h3{line-height:1.4}p{max-width:76ch}button,.button{font:inherit;cursor:pointer;color:#fff;background:#176654;border:1px solid #176654;border-radius:6px;padding:.55rem 1rem;text-decoration:none;display:inline-block}button:focus-visible,a:focus-visible,summary:focus-visible{outline-offset:4px;outline:3px solid #c47728}.eyebrow{letter-spacing:.12em;color:#577062;font-size:.8rem;font-weight:700}.lead{color:#526259;font-size:1.2rem}.cards{grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:1rem;display:grid}.card{color:inherit;background:#fff;border:1px solid #d8ded5;border-radius:10px;padding:1.5rem;text-decoration:none;display:block}.card:hover{border-color:#176654}.card h3{font-size:1.3rem}.layout{grid-template-columns:210px minmax(0,1fr);gap:3rem;display:grid}.steps{align-self:start;position:sticky;top:1rem}.steps a{padding:.35rem 0;display:block}.lesson section{border-top:1px solid #d8ded5;padding:1.4rem 0;scroll-margin-top:1rem}.lesson h2{font-size:1.65rem}.prose{white-space:pre-wrap;overflow-wrap:anywhere}.rich{overflow-x:auto}.rich p{white-space:normal}pre{color:#f3f6ee;tab-size:2;background:#18342e;border-radius:8px;max-width:100%;padding:1.2rem;font-size:.9rem;overflow:auto}code{font-family:ui-monospace,monospace}.file{margin:.6rem 0;display:block}.file small{color:#526259;display:block}figure{margin:1.5rem 0}img{border-radius:8px;max-width:100%;height:auto}figcaption{color:#526259;font-size:.9rem}table{border-collapse:collapse;max-width:100%;display:block;overflow:auto}th,td{border:1px solid #bcc8bd;padding:.5rem}details{background:#f0eee5;border-radius:8px;padding:1rem}summary{cursor:pointer;font-weight:650}.quiz-options{gap:.5rem;display:grid}.quiz-options button{color:#18342e;text-align:left;background:#fff}.quiz-result{font-weight:650}.skip{position:absolute;left:-9999px}.skip:focus{z-index:2;background:#fff;padding:1rem;left:1rem}footer{text-align:center;color:#526259;border-top:1px solid #d8ded5;padding:2rem;font-size:.85rem}.empty{padding:4rem 0}.home-section{margin:3rem 0}@media (width<=768px){header{flex-direction:column;align-items:flex-start;gap:.7rem}main{padding:2rem 1rem}.layout{grid-template-columns:1fr;gap:1rem}.steps{border-bottom:1px solid #d8ded5;padding-bottom:1rem;position:static}.steps a{margin-right:1rem;display:inline-block}nav{gap:.6rem 1rem;font-size:.9rem}}@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style></head><body><a class="skip" href="#main">본문으로 이동</a><header><a class="brand" href="/dataAnalytics/">외식빅데이터애널리틱스</a><nav aria-label="주 메뉴"><a href="/dataAnalytics/#lesson">수업 실습</a><a href="https://ecampus.sejong.ac.kr/course/view.php?id=33538" rel="noopener noreferrer">집현캠퍼스 · 공식 제출</a></nav></header><main id="main"><p><a href="/dataAnalytics/">← 수업 실습</a></p><h1>LAB-03 · 식사금액이 클수록 팁도 클까?</h1><p class="lead">식사금액과 팁의 산점도를 먼저 보고 관계의 방향·퍼짐·영향력이 큰 관측치를 예상한다. 단순회귀와 인원수·요일을 포함한 회귀를 비교하고, 조건부 연관성을 인과효과와 구분한다.</p><div class="layout"><aside class="steps" aria-label="실습 단계"><a href="#step-1">분석 질문과 먼저 생각하기</a><a href="#step-2">데이터 이해</a><a href="#step-3">내 PC에서 실행하기</a><a href="#step-4">따라 하기</a><a href="#step-5">실제 R 기준 출력</a><a href="#step-6">결과 해석</a><a href="#step-7">바꿔 해보기</a><a href="#step-8">막힐 때</a><a href="#step-9">실습 파일 묶음과 보고서 틀</a><a href="#step-10">출처</a></aside><article class="lesson"><section id="step-1"><h2>분석 질문과 먼저 생각하기</h2><p class="prose">식사금액과 팁의 산점도를 먼저 보고 관계의 방향·퍼짐·영향력이 큰 관측치를 예상한다. 단순회귀와 인원수·요일을 포함한 회귀를 비교하고, 조건부 연관성을 인과효과와 구분한다.</p></section><section id="step-2"><h2>데이터 이해</h2><p class="prose">원전: 박광민, 『비즈니스 애널리틱스』 6장 6.1 및 6.10. https://kwangminpark.github.io/businessAnalytics/Chapter6.html
+
+원전은 `reshape2` 패키지의 `tips`를 사용한다. 이 패키지의 `data/tips.csv`는 CRAN 소스 미러 `cran/reshape2`의 `data/tips.rda`를 실제 R에서 읽어 CSV로 내보낸 것이다. 데이터에 새로운 행이나 값을 추가하지 않았다. 정확한 파일 해시는 `provenance.json`에 기록한다. 오프라인 실습에서는 이 CSV를 사용하므로 reshape2 설치가 필요 없다.
+
+244행·7열이며 결측치는 없다. 한 행은 식사 계산서 한 건이다. `total_bill`과 `tip`은 미국 달러, `size`는 동석 인원수다. `day`는 Thur/Fri/Sat/Sun, `time`은 Lunch/Dinner, `sex`와 `smoker`는 원본의 범주 변수다. 금액을 원화나 천원 단위로 바꾸어 읽지 않는다. 국내 외식업 전체의 대표 표본이라고 간주하지 않는다.</p><a class="file" href="/dataAnalytics/downloads/e54cc4d2ce1bff65-tips.csv" download>tips.csv ↓<small>10 KB · reshape2 tips 원본을 R에서 CSV로 내보냄 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html</small></a></section><section id="step-3"><h2>내 PC에서 실행하기</h2><p class="prose">패키지를 새 폴더에 풀어 RStudio 프로젝트로 연다. `analysis.R`를 Source하거나 이 폴더에서 `Rscript --vanilla analysis.R`를 실행한다. 추가 패키지는 필요 없다. 생성된 회귀계수 CSV, 산점도, 네 가지 진단 그림을 `reference-output`과 비교한다.
+
+단순모형: `tip ~ total_bill`.
+
+조건부모형: `tip ~ total_bill + size + day`. 요일 기준범주는 Sun으로 명시한다. 코드에서 factor 순서를 고정하므로 환경의 기본 정렬 순서에 의존하지 않는다.</p></section><section id="step-4"><h2>따라 하기</h2><button type="button" class="copy-code">코드 복사</button><pre><code># LAB-03. tips, exported from reshape2 data/tips.rda, as used by textbook chapter 6.
+# Offline CSV avoids installing reshape2 for this exercise; analysis uses base/recommended R only.
+options(digits = 7)
+d &lt;- read.csv(&quot;data/tips.csv&quot;, stringsAsFactors = FALSE)
+stopifnot(nrow(d) == 244, !anyNA(d), all(d$total_bill &gt; 0), all(d$tip &gt;= 0), all(d$size &gt;= 1))
+d$day &lt;- factor(d$day, levels = c(&quot;Sun&quot;, &quot;Thur&quot;, &quot;Fri&quot;, &quot;Sat&quot;))
+stopifnot(!anyNA(d$day))
+dir.create(&quot;output&quot;, showWarnings = FALSE)
+simple &lt;- lm(tip ~ total_bill, data = d)
+adjusted &lt;- lm(tip ~ total_bill + size + day, data = d)
+coefficient_table &lt;- function(fit) {
+  coefficients &lt;- coef(summary(fit)); ci &lt;- confint(fit)
+  data.frame(term = rownames(coefficients), estimate = coefficients[,1], se = coefficients[,2],
+             t = coefficients[,3], p = coefficients[,4], low = ci[,1], high = ci[,2], row.names = NULL)
+}
+write.csv(coefficient_table(simple), &quot;output/simple-coefficients.csv&quot;, row.names = FALSE)
+write.csv(coefficient_table(adjusted), &quot;output/adjusted-coefficients.csv&quot;, row.names = FALSE)
+# HC3 standard errors: illustrates sensitivity to nonconstant residual variance.
+X &lt;- model.matrix(adjusted)
+bread &lt;- solve(crossprod(X))
+w &lt;- residuals(adjusted)^2/(1-hatvalues(adjusted))^2
+hc3 &lt;- bread %*% crossprod(X, X * w) %*% bread
+write.csv(data.frame(term = names(coef(adjusted)), classical_se = coef(summary(adjusted))[,2],
+                     hc3_se = sqrt(diag(hc3))), &quot;output/se-comparison.csv&quot;, row.names = FALSE)
+write.csv(data.frame(model = c(&quot;simple&quot;, &quot;adjusted&quot;), r_squared = c(summary(simple)$r.squared, summary(adjusted)$r.squared),
+                     residual_sd = c(summary(simple)$sigma, summary(adjusted)$sigma)),
+          &quot;output/model-metrics.csv&quot;, row.names = FALSE)
+png(&quot;output/bill-and-tip.png&quot;, width = 1200, height = 750, res = 140)
+plot(d$total_bill, d$tip, pch = 16, col = &quot;#24654e88&quot;, xlab = &quot;Total bill (USD)&quot;, ylab = &quot;Tip (USD)&quot;,
+     main = &quot;A positive association is not a causal effect&quot;)
+abline(simple, col = &quot;#a04c27&quot;, lwd = 2)
+legend(&quot;topleft&quot;, &quot;Simple linear fit&quot;, col = &quot;#a04c27&quot;, lty = 1, lwd = 2, bty = &quot;n&quot;)
+dev.off()
+png(&quot;output/diagnostics.png&quot;, width = 1400, height = 1000, res = 130)
+par(mfrow = c(2, 2)); plot(adjusted); dev.off()
+capture.output({cat(&quot;LAB-03: 244 restaurant bills from reshape2::tips\n&quot;); print(summary(simple)); print(summary(adjusted));
+  cat(&quot;\nClassical and HC3 standard errors:\n&quot;); print(read.csv(&quot;output/se-comparison.csv&quot;));
+  cat(&quot;\nMaximum Cook distance:&quot;, max(cooks.distance(adjusted)), &quot;\n&quot;);
+  cat(&quot;Within-sample associations; no random assignment, no causal or universal restaurant claim.\n&quot;)},
+  file = &quot;output/results.txt&quot;)
+capture.output(sessionInfo(), file = &quot;output/session-info.txt&quot;)
+cat(readLines(&quot;output/results.txt&quot;), sep = &quot;\n&quot;)
+</code></pre><a class="file" href="/dataAnalytics/downloads/c98e417baffa066e-analysis.R" download>analysis.R ↓<small>3 KB · reshape2 tips 원본을 R에서 CSV로 내보냄 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html</small></a></section><section id="step-5"><h2>실제 R 기준 출력</h2><p class="prose">LAB-03: 244 restaurant bills from reshape2::tips
+
+Call:
+lm(formula = tip ~ total_bill, data = d)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-3.1982 -0.5652 -0.0974  0.4863  3.7434 
+
+Coefficients:
+            Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept) 0.920270   0.159735   5.761 2.53e-08 ***
+total_bill  0.105025   0.007365  14.260  &lt; 2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 1.022 on 242 degrees of freedom
+Multiple R-squared:  0.4566,	Adjusted R-squared:  0.4544 
+F-statistic: 203.4 on 1 and 242 DF,  p-value: &lt; 2.2e-16
+
+
+Call:
+lm(formula = tip ~ total_bill + size + day, data = d)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-2.8784 -0.5739 -0.0838  0.4946  4.0925 
+
+Coefficients:
+             Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)  0.732289   0.237588   3.082   0.0023 ** 
+total_bill   0.092994   0.009239  10.065   &lt;2e-16 ***
+size         0.187132   0.087199   2.146   0.0329 *  
+dayThur     -0.063995   0.177069  -0.361   0.7181    
+dayFri       0.013498   0.266391   0.051   0.9596    
+daySat      -0.111160   0.161753  -0.687   0.4926    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 1.019 on 238 degrees of freedom
+Multiple R-squared:  0.4691,	Adjusted R-squared:  0.458 
+F-statistic: 42.07 on 5 and 238 DF,  p-value: &lt; 2.2e-16
+
+
+Classical and HC3 standard errors:
+         term classical_se     hc3_se
+1 (Intercept)  0.237588124 0.28387247
+2  total_bill  0.009239127 0.01646393
+3        size  0.087198911 0.11376778
+4     dayThur  0.177068851 0.16379166
+5      dayFri  0.266391303 0.20569733
+6      daySat  0.161753182 0.18193718
+
+Maximum Cook distance: 0.2382209 
+Within-sample associations; no random assignment, no causal or universal restaurant claim.
+</p><figure><img src="/dataAnalytics/downloads/0244ef99e0ee4edf-diagnostics.png" alt="실제 R 기준 출력"><figcaption>reshape2 tips 원본을 R에서 CSV로 내보냄 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html</figcaption></figure><a class="file" href="/dataAnalytics/downloads/0244ef99e0ee4edf-diagnostics.png" download>diagnostics.png ↓<small>208 KB · reshape2 tips 원본을 R에서 CSV로 내보냄 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html</small></a><a class="file" href="/dataAnalytics/downloads/545c755b7f254dfa-simple-coefficients.csv" download>simple-coefficients.csv ↓<small>1 KB · reshape2 tips 원본을 R에서 CSV로 내보냄 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html</small></a><a class="file" href="/dataAnalytics/downloads/cec8586cf985db26-session-info.txt" download>session-info.txt ↓<small>1 KB · reshape2 tips 원본을 R에서 CSV로 내보냄 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html</small></a><figure><img src="/dataAnalytics/downloads/d6d73916d3ff49c0-bill-and-tip.png" alt="실제 R 기준 출력"><figcaption>reshape2 tips 원본을 R에서 CSV로 내보냄 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html</figcaption></figure><a class="file" href="/dataAnalytics/downloads/d6d73916d3ff49c0-bill-and-tip.png" download>bill-and-tip.png ↓<small>43 KB · reshape2 tips 원본을 R에서 CSV로 내보냄 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html</small></a><a class="file" href="/dataAnalytics/downloads/f3b4b5ae3bd42f9d-model-metrics.csv" download>model-metrics.csv ↓<small>1 KB · reshape2 tips 원본을 R에서 CSV로 내보냄 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html</small></a><a class="file" href="/dataAnalytics/downloads/0466495909b4cab6-adjusted-coefficients.csv" download>adjusted-coefficients.csv ↓<small>1 KB · reshape2 tips 원본을 R에서 CSV로 내보냄 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html</small></a><a class="file" href="/dataAnalytics/downloads/89fb2575f43f2cc4-se-comparison.csv" download>se-comparison.csv ↓<small>1 KB · reshape2 tips 원본을 R에서 CSV로 내보냄 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html</small></a></section><section id="step-6"><h2>결과 해석</h2><p class="prose">조건부모형에서 `total_bill` 계수는 약 **0.092994**이며 고전적 95% 신뢰구간은 **[0.074793, 0.111195]**다. 인원수와 요일이 같은 조건에서, 식사금액 1달러 차이는 평균 팁 약 0.093달러 차이와 연관된다. 10달러 차이에 대해서는 약 0.930달러다. 이는 가격을 10달러 올리면 팁이 그만큼 증가한다는 실험적 인과효과가 아니다.
+
+인원수 계수는 약 0.187132다. 인원수와 식사금액은 연관될 수 있으므로 단순모형과 조건부모형의 계수를 혼동하지 않는다. 요일 계수가 유의하지 않다고 요일 효과가 정확히 0임을 입증한 것은 아니다.
+
+잔차-적합값 그림에서 퍼짐을, Q-Q 그림에서 꼬리 형태를, 잔차-레버리지 그림에서 영향력을 살핀다. 가장 큰 Cook 거리는 약 0.238이다. 자동 삭제 기준으로 쓰지 말고 원자료와 민감도 분석의 단서로 사용한다. `se-comparison.csv`의 HC3 표준오차는 비등분산에 대한 민감도 비교이며 독립성·표본 대표성까지 보장하지 않는다.</p></section><section id="step-7"><h2>바꿔 해보기</h2><p class="prose">1. 인원수 2명·일요일·식사금액 20달러와 30달러의 예측값을 구해 계수의 10배 차이와 비교한다.
+2. Cook 거리가 가장 큰 한 건을 제외한 모형을 별도로 적합하고 `total_bill` 계수 변화량을 보고한다. 원본 결과도 함께 남긴다.
+3. 원본 범위 밖 100달러 계산서에 대한 예측이 왜 외삽인지 설명한다. 설명력과 새 데이터 예측 성능이 같은 개념인지 논의한다.</p></section><section id="step-8"><h2>막힐 때</h2><details><summary>오류와 확인 순서 펼치기</summary><p class="prose">`object &#39;total_bill&#39; not found`는 파일·열 이름을 먼저 확인한다. 요일 계수가 다르면 기준범주와 factor 순서를 확인한다. `could not find function` 오류가 나면 스크립트 전체를 처음부터 Source했는지 확인한다. 값이 다르면 CSV 해시, 행 수, 제외 관측, 모형식을 순서대로 비교한다.
+
+산점도·회귀표·진단·적절한 해석과 과장된 해석 각 1문장·독립 연습 결과를 보고서에 기록한다. 비공개 GitHub 프로젝트에 코드와 결과를 Commit하고, 공식 제출은 집현캠퍼스 안내를 따른다. 마감·배점은 미등록이다.</p></details></section><section id="step-9"><h2>실습 파일 묶음과 보고서 틀</h2><p class="prose">실행 코드·데이터·기준 출력·해설·보고서 틀을 함께 받으세요. 공식 제출은 집현캠퍼스 안내를 따릅니다. 강의 일정과 LMS 주소는 아직 미등록입니다.</p><a class="file" href="/dataAnalytics/downloads/050759956f7beda9-lab-03.zip" download>lab-03.zip ↓<small>245 KB · reshape2 tips 원본을 R에서 CSV로 내보냄 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html</small></a><a class="file" href="/dataAnalytics/downloads/4292fbad6298692b-report-template.qmd" download>report-template.qmd ↓<small>1 KB · reshape2 tips 원본을 R에서 CSV로 내보냄 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html</small></a><a class="file" href="/dataAnalytics/downloads/eb79cb653330717a-reference-report.qmd" download>reference-report.qmd ↓<small>1 KB · reshape2 tips 원본을 R에서 CSV로 내보냄 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html</small></a><a class="file" href="/dataAnalytics/downloads/915d2deb943be93b-README.md" download>README.md ↓<small>5 KB · reshape2 tips 원본을 R에서 CSV로 내보냄 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html</small></a></section><section id="step-10"><h2>출처</h2><p class="prose">reshape2 tips 원본을 R에서 CSV로 내보냄 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html</p></section><section><h2>출처와 다음 행동</h2><p><a href="https://kwangminpark.github.io/businessAnalytics/Chapter6.html" rel="noopener noreferrer">원전 교재</a></p><p><a href="https://raw.githubusercontent.com/cran/reshape2/435df3cdf2b202ef558cdcb766e6511742d8ce84/data/tips.rda" rel="noopener noreferrer">고정된 원본 데이터</a></p><p>실행한 코드와 결과, 결과를 설명하는 README를 자신의 분석 프로젝트에 기록하세요. 공식 제출은 집현캠퍼스의 안내를 따르세요.</p></section></article></div></main><footer>공식 제출·평가는 집현캠퍼스에서 진행합니다. 이 사이트의 자기점검은 학습용입니다.</footer></body></html><script type="module">document.querySelectorAll(`.copy-code`).forEach(e=>e.addEventListener(`click`,async()=>{try{await navigator.clipboard.writeText(e.nextElementSibling?.textContent||``),e.textContent=`복사됨`}catch{e.textContent=`코드를 선택해서 복사하세요`}})),document.querySelectorAll(`.quiz`).forEach(e=>e.querySelectorAll(`button`).forEach(t=>t.addEventListener(`click`,()=>{e.querySelector(`.quiz-result`).textContent=t.dataset.option===e.dataset.answer?`맞습니다. 본문의 해석과 근거를 다시 연결해 보세요.`:`다시 생각해 보세요. 본문의 조건과 해석을 확인하세요.`})));</script>
