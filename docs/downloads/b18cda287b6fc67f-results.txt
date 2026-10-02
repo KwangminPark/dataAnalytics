@@ -1,0 +1,76 @@
+    region   n     mean   median        sd       IQR
+1    Busan 118 4.021896 4.072009 0.5651882 0.7873181
+2  Daejeon  97 4.025518 4.100106 0.6929840 0.9987985
+3 Gyeonggi 131 3.961201 3.919823 0.6716659 0.9111789
+4    Seoul 154 3.916935 3.894961 0.6668205 0.9700309
+null device 
+          1 
+
+	One Sample t-test
+
+data:  a
+t = 4.7681, df = 499, p-value = 2.444e-06
+alternative hypothesis: true mean is not equal to 4
+95 percent confidence interval:
+ 4.069906 4.167893
+sample estimates:
+mean of x 
+   4.1189 
+
+
+	Welch Two Sample t-test
+
+data:  a and b
+t = 8.6404, df = 971.34, p-value < 2.2e-16
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ 0.2578229 0.4093526
+sample estimates:
+mean of x mean of y 
+ 4.118900  3.785312 
+
+
+	F test to compare two variances
+
+data:  a and b
+F = 0.71576, num df = 499, denom df = 499, p-value = 0.0001957
+alternative hypothesis: true ratio of variances is not equal to 1
+95 percent confidence interval:
+ 0.6004416 0.8532281
+sample estimates:
+ratio of variances 
+         0.7157609 
+
+
+	Two Sample t-test
+
+data:  a and b
+t = 8.6404, df = 998, p-value < 2.2e-16
+alternative hypothesis: true difference in means is not equal to 0
+95 percent confidence interval:
+ 0.2578254 0.4093501
+sample estimates:
+mean of x mean of y 
+ 4.118900  3.785312 
+
+   question difference        low      high            p
+1 A minus 4  0.1188997 0.06990644 0.1678930 2.443896e-06
+2 A minus B  0.3335878 0.25782288 0.4093526 2.276414e-17
+
+	Paired t-test
+
+data:  pair$after and pair$before
+t = 23.884, df = 299, p-value < 2.2e-16
+alternative hypothesis: true mean difference is not equal to 0
+95 percent confidence interval:
+ 0.3735830 0.4406729
+sample estimates:
+mean difference 
+      0.4071279 
+
+    n mean_change      low      high           p
+1 300   0.4071279 0.373583 0.4406729 2.81478e-71
+null device 
+          1 
+  difference  cohens_d discussion_threshold
+1  0.3335878 0.5464643                  0.2

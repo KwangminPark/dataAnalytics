@@ -1,0 +1,9 @@
+﻿file,column,rows,missing,nature
+ch3_data1.csv,region,500,0,교수 제공 data.zip 원본 (값·바이트 보존)
+ch3_data1.csv,score,500,0,교수 제공 data.zip 원본 (값·바이트 보존)
+ch3_data2.csv,employee_id,1000,0,교수 제공 data.zip 원본 (값·바이트 보존)
+ch3_data2.csv,group,1000,0,교수 제공 data.zip 원본 (값·바이트 보존)
+ch3_data2.csv,score,1000,0,교수 제공 data.zip 원본 (값·바이트 보존)
+ch3_data3.csv,employee_id,300,0,교수 제공 data.zip 원본 (값·바이트 보존)
+ch3_data3.csv,before,300,0,교수 제공 data.zip 원본 (값·바이트 보존)
+ch3_data3.csv,after,300,0,교수 제공 data.zip 원본 (값·바이트 보존)
