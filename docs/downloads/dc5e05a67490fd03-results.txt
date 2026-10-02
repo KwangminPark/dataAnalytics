@@ -1,0 +1,79 @@
+'data.frame':	32 obs. of  12 variables:
+ $ car : chr  "Mazda RX4" "Mazda RX4 Wag" "Datsun 710" "Hornet 4 Drive" ...
+ $ mpg : num  21 21 22.8 21.4 18.7 18.1 14.3 24.4 22.8 19.2 ...
+ $ cyl : int  6 6 4 6 8 6 8 4 4 6 ...
+ $ disp: num  160 160 108 258 360 ...
+ $ hp  : int  110 110 93 110 175 105 245 62 95 123 ...
+ $ drat: num  3.9 3.9 3.85 3.08 3.15 2.76 3.21 3.69 3.92 3.92 ...
+ $ wt  : num  2.62 2.88 2.32 3.21 3.44 ...
+ $ qsec: num  16.5 17 18.6 19.4 17 ...
+ $ vs  : int  0 0 1 1 0 1 0 1 1 1 ...
+ $ am  : int  1 1 1 0 0 0 0 0 0 0 ...
+ $ gear: int  4 4 4 3 3 3 3 4 4 4 ...
+ $ carb: int  4 4 1 1 2 1 4 2 2 4 ...
+
+ 0  1 
+19 13 
+       type  n proportion
+1 automatic 19    0.59375
+2    manual 13    0.40625
+  cyl  n     mean median       sd  IQR
+1   4 11 26.66364   26.0 4.509828 7.60
+2   6  7 19.74286   19.7 1.453567 2.35
+3   8 14 15.10000   15.2 2.560048 1.85
+            Df Sum Sq Mean Sq F value   Pr(>F)    
+cyl_group    2  824.8   412.4    39.7 4.98e-09 ***
+Residuals   29  301.3    10.4                     
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+'data.frame':	500 obs. of  6 variables:
+ $ store_id    : chr  "A001" "A002" "A003" "A004" ...
+ $ location    : chr  "이태원" "명동" "건대" "명동" ...
+ $ avg_spend   : int  15916 12063 14046 11069 12972 11610 12291 13785 9545 18277 ...
+ $ visit_time  : int  55 18 44 53 41 56 32 61 74 35 ...
+ $ membership  : chr  "일반" "일반" "일반" "일반" ...
+ $ satisfaction: int  3 5 4 4 2 3 3 5 4 3 ...
+   store_id           location           avg_spend       visit_time   
+ Length:500         Length:500         Min.   : 5000   Min.   :10.00  
+ Class :character   Class :character   1st Qu.: 9880   1st Qu.:32.00  
+ Mode  :character   Mode  :character   Median :11944   Median :42.00  
+                                       Mean   :11958   Mean   :41.91  
+                                       3rd Qu.:13870   3rd Qu.:51.00  
+                                       Max.   :21237   Max.   :79.00  
+  membership         satisfaction 
+ Length:500         Min.   :1.00  
+ Class :character   1st Qu.:3.00  
+ Mode  :character   Median :3.00  
+                    Mean   :3.33  
+                    3rd Qu.:4.00  
+                    Max.   :5.00  
+                 variable   r_class missing
+store_id         store_id character       0
+location         location character       0
+avg_spend       avg_spend   integer       0
+visit_time     visit_time   integer       0
+membership     membership character       0
+satisfaction satisfaction   integer       0
+  location   n     mean  median       sd     IQR
+1     강남 109 11776.47 11337.0 3042.637 4162.00
+2     건대  91 11733.75 11710.0 2696.182 3402.50
+3     명동  93 12577.99 12707.0 3258.174 4240.00
+4   이태원 112 11735.89 11943.5 2835.195 3742.25
+5     홍대  95 12035.41 11902.0 2804.310 4067.00
+      
+        1  2  3  4  5
+  VIP  15 14 53 48 20
+  일반 41 46 90 97 76
+      
+                1          2          3          4          5
+  VIP  0.10000000 0.09333333 0.35333333 0.32000000 0.13333333
+  일반 0.11714286 0.13142857 0.25714286 0.27714286 0.21714286
+                  Df    Sum Sq  Mean Sq F value Pr(>F)
+factor(location)   4 5.001e+07 12502667   1.452  0.216
+Residuals        495 4.262e+09  8610506               
+visit_time / avg_spend correlation: 0.006872042 
+null device 
+          1 
+               question numerator denominator
+1 VIP share of all rows       150         500
+2  Score >= 4 among VIP        68         150

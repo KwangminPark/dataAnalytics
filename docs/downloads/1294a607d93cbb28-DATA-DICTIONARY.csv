@@ -1,0 +1,19 @@
+﻿file,column,rows,missing,nature
+ch2_data.csv,store_id,500,0,교수 제공 data.zip 원본 (값·바이트 보존)
+ch2_data.csv,location,500,0,교수 제공 data.zip 원본 (값·바이트 보존)
+ch2_data.csv,avg_spend,500,0,교수 제공 data.zip 원본 (값·바이트 보존)
+ch2_data.csv,visit_time,500,0,교수 제공 data.zip 원본 (값·바이트 보존)
+ch2_data.csv,membership,500,0,교수 제공 data.zip 원본 (값·바이트 보존)
+ch2_data.csv,satisfaction,500,0,교수 제공 data.zip 원본 (값·바이트 보존)
+mtcars.csv,car,32,0,R datasets::mtcars에서 CSV로 내보냄
+mtcars.csv,mpg,32,0,R datasets::mtcars에서 CSV로 내보냄
+mtcars.csv,cyl,32,0,R datasets::mtcars에서 CSV로 내보냄
+mtcars.csv,disp,32,0,R datasets::mtcars에서 CSV로 내보냄
+mtcars.csv,hp,32,0,R datasets::mtcars에서 CSV로 내보냄
+mtcars.csv,drat,32,0,R datasets::mtcars에서 CSV로 내보냄
+mtcars.csv,wt,32,0,R datasets::mtcars에서 CSV로 내보냄
+mtcars.csv,qsec,32,0,R datasets::mtcars에서 CSV로 내보냄
+mtcars.csv,vs,32,0,R datasets::mtcars에서 CSV로 내보냄
+mtcars.csv,am,32,0,R datasets::mtcars에서 CSV로 내보냄
+mtcars.csv,gear,32,0,R datasets::mtcars에서 CSV로 내보냄
+mtcars.csv,carb,32,0,R datasets::mtcars에서 CSV로 내보냄
