@@ -1,0 +1,6 @@
+﻿file,column,rows,missing,nature
+decision-example.csv,day,2,0,1장 상황에 맞춰 새로 구성한 설명용 2행 (실제 관측 아님)
+decision-example.csv,visitors,2,0,1장 상황에 맞춰 새로 구성한 설명용 2행 (실제 관측 아님)
+decision-example.csv,buyers,2,0,1장 상황에 맞춰 새로 구성한 설명용 2행 (실제 관측 아님)
+decision-example.csv,sales,2,0,1장 상황에 맞춰 새로 구성한 설명용 2행 (실제 관측 아님)
+decision-example.csv,labor_hours,2,0,1장 상황에 맞춰 새로 구성한 설명용 2행 (실제 관측 아님)

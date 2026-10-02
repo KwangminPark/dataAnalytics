@@ -1,0 +1,3 @@
+"day","visitors","buyers","sales","labor_hours","buy_rate","sales_per_buyer","sales_per_labor_hour"
+"Friday",80,72,1080000,24,0.9,15000,45000
+"Saturday",100,70,980000,30,0.7,14000,32666.6666666667

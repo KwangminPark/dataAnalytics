@@ -1,0 +1,12 @@
+       day visitors buyers   sales labor_hours
+1   Friday       80     72 1080000          24
+2 Saturday      100     70  980000          30
+       day visitors buyers   sales labor_hours buy_rate sales_per_buyer
+1   Friday       80     72 1080000          24      0.9           15000
+2 Saturday      100     70  980000          30      0.7           14000
+  sales_per_labor_hour
+1             45000.00
+2             32666.67
+null device 
+          1 
+Friday/Saturday are a constructed teaching example. Labor hours are not labor cost.
