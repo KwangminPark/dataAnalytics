@@ -2,7 +2,7 @@ import {chatRequest} from './chat-history.js';
 const $=id=>document.getElementById(id), gateway=document.querySelector('[data-gateway]').dataset.gateway;
 const status=message=>{$('ai-status').textContent=message;};
 let token=sessionStorage.getItem('tower-ai-token')||'',student=null,history=[],busy=false;
-const labFromUrl=new URLSearchParams(location.search).get('lab');if(['lab-01','lab-02','lab-03'].includes(labFromUrl))$('lab').value=labFromUrl;
+const labFromUrl=new URLSearchParams(location.search).get('lab');if(Array.from($('lab').options).some(option=>option.value===labFromUrl))$('lab').value=labFromUrl;
 const savedLanguage=sessionStorage.getItem('tower-ai-language');if(['ko','en','auto'].includes(savedLanguage))$('answer-language').value=savedLanguage;
 const historyKey=()=>`tower-ai-history:${student?.id}:${$('lab').value}`;
 const money=n=>'$'+Number(n||0).toFixed(4);
