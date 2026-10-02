@@ -1,0 +1,48 @@
+
+  메가커피   스타벅스 컴포즈커피 
+        30         30         30 
+
+2025-06-01 2025-06-02 2025-06-03 2025-06-04 2025-06-05 2025-06-06 2025-06-07 
+         3          3          3          3          3          3          3 
+2025-06-08 2025-06-09 2025-06-10 2025-06-11 2025-06-12 2025-06-13 2025-06-14 
+         3          3          3          3          3          3          3 
+2025-06-15 2025-06-16 2025-06-17 2025-06-18 2025-06-19 2025-06-20 2025-06-21 
+         3          3          3          3          3          3          3 
+2025-06-22 2025-06-23 2025-06-24 2025-06-25 2025-06-26 2025-06-27 2025-06-28 
+         3          3          3          3          3          3          3 
+2025-06-29 2025-06-30 
+         3          3 
+       brand  n      mean  median        sd      IQR
+1   메가커피 30 1186152.9 1180720 116788.48 162190.2
+2   스타벅스 30 1677475.3 1677892 122632.85 102971.2
+3 컴포즈커피 30  909886.9  914381  77857.45 109677.8
+            Df    Sum Sq   Mean Sq F value Pr(>F)    
+brand        2 9.069e+12 4.535e+12   391.6 <2e-16 ***
+Residuals   87 1.007e+12 1.158e+10                   
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+           comparison      diff       lwr       upr        p adj
+1   스타벅스-메가커피  491322.4  425069.7  557575.0 3.090042e-10
+2 컴포즈커피-메가커피 -276266.0 -342518.6 -210013.4 3.090319e-10
+3 컴포즈커피-스타벅스 -767588.4 -833841.0 -701335.7 3.090042e-10
+null device 
+          1 
+Residual normality diagnostic:
+
+	Shapiro-Wilk normality test
+
+data:  resid(m)
+W = 0.98445, p-value = 0.3604
+
+Welch ANOVA sensitivity:
+
+	One-way analysis of means (not assuming equal variances)
+
+data:  sales and brand
+F = 416.42, num df = 2.0, denom df = 55.3, p-value < 2.2e-16
+
+       brand    sales visitors buyers purchase_rate sales_per_buyer
+1   메가커피 35584588     9269   5469     0.5900313        6506.599
+2   스타벅스 50324259     9573   6412     0.6698005        7848.450
+3 컴포즈커피 27296608     8598   5180     0.6024657        5269.615
+30 repeated days per brand/store; inference assumes independence not guaranteed by these rows.
