@@ -1,0 +1,8 @@
+﻿file,column,rows,missing,nature
+tips.csv,total_bill,244,0,reshape2::tips 고정 원본 RDA에서 CSV로 내보냄
+tips.csv,tip,244,0,reshape2::tips 고정 원본 RDA에서 CSV로 내보냄
+tips.csv,sex,244,0,reshape2::tips 고정 원본 RDA에서 CSV로 내보냄
+tips.csv,smoker,244,0,reshape2::tips 고정 원본 RDA에서 CSV로 내보냄
+tips.csv,day,244,0,reshape2::tips 고정 원본 RDA에서 CSV로 내보냄
+tips.csv,time,244,0,reshape2::tips 고정 원본 RDA에서 CSV로 내보냄
+tips.csv,size,244,0,reshape2::tips 고정 원본 RDA에서 CSV로 내보냄

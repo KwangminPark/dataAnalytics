@@ -1,0 +1,56 @@
+   total_bill         tip             sex               smoker         
+ Min.   : 3.07   Min.   : 1.000   Length:244         Length:244        
+ 1st Qu.:13.35   1st Qu.: 2.000   Class :character   Class :character  
+ Median :17.80   Median : 2.900   Mode  :character   Mode  :character  
+ Mean   :19.79   Mean   : 2.998                                        
+ 3rd Qu.:24.13   3rd Qu.: 3.562                                        
+ Max.   :50.81   Max.   :10.000                                        
+   day         time                size     
+ Sun :76   Length:244         Min.   :1.00  
+ Thur:62   Class :character   1st Qu.:2.00  
+ Fri :19   Mode  :character   Median :2.00  
+ Sat :87                      Mean   :2.57  
+                              3rd Qu.:3.00  
+                              Max.   :6.00  
+
+ Sun Thur  Fri  Sat 
+  76   62   19   87 
+         term    estimate          se            p         low      high
+1 (Intercept)  0.73228865 0.237588124 2.297005e-03  0.26424443 1.2003329
+2  total_bill  0.09299361 0.009239127 4.400036e-20  0.07479270 0.1111945
+3        size  0.18713231 0.087198911 3.288157e-02  0.01535207 0.3589126
+4     dayThur -0.06399504 0.177068851 7.181111e-01 -0.41281741 0.2848273
+5      dayFri  0.01349818 0.266391303 9.596306e-01 -0.51128777 0.5382841
+6      daySat -0.11116007 0.161753182 4.926130e-01 -0.42981085 0.2074907
+          model        r2 adjusted_r2
+1        simple 0.4566166   0.4543712
+2 chapter-model 0.4691465   0.4579941
+3      expanded 0.4700781   0.4520382
+null device 
+          1 
+null device 
+          1 
+        term      vif
+1 total_bill 1.584289
+2       size 1.610762
+3    dayThur 1.397361
+4     dayFri 1.198222
+5     daySat 1.411515
+                   term    estimate    usual_se     hc3_se     hc3_low
+(Intercept) (Intercept)  0.73228865 0.237588124 0.28387247  0.17306512
+total_bill   total_bill  0.09299361 0.009239127 0.01646393  0.06055997
+size               size  0.18713231 0.087198911 0.11376778 -0.03698811
+dayThur         dayThur -0.06399504 0.177068851 0.16379166 -0.38666158
+dayFri           dayFri  0.01349818 0.266391303 0.20569733 -0.39172176
+daySat           daySat -0.11116007 0.161753182 0.18193718 -0.46957294
+             hc3_high
+(Intercept) 1.2915122
+total_bill  0.1254273
+size        0.4112527
+dayThur     0.2586715
+dayFri      0.4187181
+daySat      0.2472528
+                  interval      fit      lwr      upr
+X1         mean-confidence 2.966425 2.701479 3.231372
+X1.1 individual-prediction 2.966425 0.942291 4.990560
+Intervals above use the ordinary lm assumptions; inspect heteroskedasticity before relying on their width.
