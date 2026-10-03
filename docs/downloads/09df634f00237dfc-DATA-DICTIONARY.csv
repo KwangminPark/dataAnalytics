@@ -1,0 +1,13 @@
+﻿file,column,rows,missing,nature
+ch5_data1.csv,점포ID,100,0,교수 제공 data.zip 원본 (값·바이트 보존)
+ch5_data1.csv,매장유형,100,0,교수 제공 data.zip 원본 (값·바이트 보존)
+ch5_data1.csv,요일,100,0,교수 제공 data.zip 원본 (값·바이트 보존)
+ch5_data1.csv,일매출,100,0,교수 제공 data.zip 원본 (값·바이트 보존)
+ch5_data2.csv,점포ID,520,0,교수 제공 data.zip 원본 (값·바이트 보존)
+ch5_data2.csv,요일,520,0,교수 제공 data.zip 원본 (값·바이트 보존)
+ch5_data2.csv,매장유형,520,0,교수 제공 data.zip 원본 (값·바이트 보존)
+ch5_data2.csv,일매출,520,0,교수 제공 data.zip 원본 (값·바이트 보존)
+ch5_data3.csv,거래ID,520,0,교수 제공 data.zip 원본 (값·바이트 보존)
+ch5_data3.csv,시간대,520,0,교수 제공 data.zip 원본 (값·바이트 보존)
+ch5_data3.csv,매장유형,520,0,교수 제공 data.zip 원본 (값·바이트 보존)
+ch5_data3.csv,고객당매출,520,0,교수 제공 data.zip 원본 (값·바이트 보존)
