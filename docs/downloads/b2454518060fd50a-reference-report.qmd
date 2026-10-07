@@ -1,0 +1,15 @@
+---
+title: "LAB-02 · 집단별 매출 차이, 90행을 독립 표본으로 봐도 될까? — 교수 검토용 기준 보고서"
+format: html
+lang: ko
+execute:
+  echo: false
+---
+
+```{r}
+source("analysis.R")
+```
+
+![실제 R 실행 결과](output/sales-comparison.png)
+
+{{< include README.md >}}
