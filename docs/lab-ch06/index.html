@@ -6,50 +6,391 @@
 
 1. 단순 연관성과 다른 변수를 고려한 회귀계수를 구별한다.
 2. 기준범주·수정 R제곱·잔차 진단을 읽는다.
-3. 이분산이 있을 때 계수와 표준오차의 역할을 구분한다.</p></section><section id="step-3"><h2>자료와 한 행의 의미</h2><p class="prose">tips.csv는 교재 6.10의 reshape2::tips 244건을 고정된 원본에서 CSV로 내보낸 자료입니다. R 기본 datasets에 포함된 자료는 아닙니다. 한 행은 식사 계산서 기록이며 total_bill·tip은 달러, size는 동석 인원, day는 요일, time은 점심/저녁, sex·smoker는 기록된 범주입니다. 동일한 상황/관측자의 기록에 따른 한계가 있어 모든 국가·식당의 팁 행동으로 일반화하지 않습니다. 성별 같은 속성의 계수를 사람의 본질이나 서비스 배분 근거로 해석하지 않습니다.</p><a class="file" href="/dataAnalytics/downloads/e54cc4d2ce1bff65-tips.csv" download>tips.csv ↓<small>10 KB · 교재 6장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html · reshape2::tips 고정 원본 RDA에서 CSV로 내보냄</small></a><a class="file" href="/dataAnalytics/downloads/acd75b6927724602-DATA-DICTIONARY.csv" download>DATA-DICTIONARY.csv ↓<small>1 KB · 교재 6장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html</small></a></section><section id="step-4"><h2>준비와 실행</h2><p class="prose">아래 실습 ZIP을 새 폴더에 풀고 analysis.R와 data 폴더를 나란히 둡니다. RStudio 프로젝트 또는 VS Code 작업 폴더를 이 위치로 엽니다. 먼저 자신의 예상을 적은 뒤 analysis.R의 번호별 구간을 실행합니다. 전체 재실행: Rscript --vanilla analysis.R. 결과는 output에 저장됩니다.
+3. 이분산이 있을 때 계수와 표준오차의 역할을 구분한다.</p></section><section id="step-3"><h2>자료와 한 행의 의미</h2><p class="prose">tips.csv는 교재 6.10의 reshape2::tips 244건을 고정된 원본에서 CSV로 내보낸 자료입니다. R 기본 datasets에 포함된 자료는 아닙니다. 한 행은 식사 계산서 기록이며 total_bill·tip은 달러, size는 동석 인원, day는 요일, time은 점심/저녁, sex·smoker는 기록된 범주입니다. 동일한 상황/관측자의 기록에 따른 한계가 있어 모든 국가·식당의 팁 행동으로 일반화하지 않습니다. 성별 같은 속성의 계수를 사람의 본질이나 서비스 배분 근거로 해석하지 않습니다.</p><a class="file" href="/dataAnalytics/downloads/e54cc4d2ce1bff65-tips.csv" download>tips.csv ↓<small>10 KB · 교재 6장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html · reshape2::tips 고정 원본 RDA에서 CSV로 내보냄</small></a><a class="file" href="/dataAnalytics/downloads/acd75b6927724602-DATA-DICTIONARY.csv" download>DATA-DICTIONARY.csv ↓<small>1 KB · 교재 6장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html</small></a></section><section id="step-4"><h2>준비와 실행</h2><p class="prose">전체 ZIP을 새 폴더에 풀고 report-template.qmd를 엽니다. 먼저 분석 질문을 적고 문서 안의 번호별 R 청크를 순서대로 실행합니다. 코드와 학생 작성란을 수정한 뒤 quarto render report-template.qmd --to html로 보고서를 생성합니다. data는 덮어쓰지 않고 계산 결과는 output에 저장됩니다. 6장 시범본: 전체 ZIP을 풀고 knitr·rmarkdown을 준비한 뒤 quarto render report-template.qmd --to html을 실행합니다. QMD 안의 번호별 R 청크를 읽고 수정·실행합니다. 표와 그림은 계산되고, 판단·해석은 학생이 직접 작성합니다. 원본 styles.css·pagebreak.lua·reference.docx를 같은 폴더에 둡니다. 학생용은 해석 작성란, 교수자용은 예시 해석을 제공합니다.
 
-8·9장은 psych와 GPArotation 패키지가 필요합니다. 처음 한 번 install.packages(c(&quot;psych&quot;, &quot;GPArotation&quot;))로 설치합니다. 이후 데이터 분석은 인터넷 없이 가능합니다. Quarto 보고서 틀은 실행 결과를 정리하는 문서이며 R 코드는 analysis.R에서 별도로 실행합니다.
+기준 출력은 먼저 자신의 결과를 만든 뒤 대조하세요.</p><a class="file" href="/dataAnalytics/downloads/63379a346f0a31b3-lab-ch06.zip" download>lab-ch06.zip ↓<small>254 KB · 교재 6장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html</small></a></section><section id="step-5"><h2>기본 실습 1 · 질문과 단위를 먼저 기록</h2><p class="prose">산점도와 요약을 보고 단순모형 tip~total_bill을 생각합니다. 이번 종속변수는 팁 비율이 아니라 팁 금액입니다. tips를 읽은 뒤 day의 기준을 Sun으로 지정했는지 확인합니다.</p></section><section id="step-6"><h2>기본 실습 2 · 교재 모형의 계수 읽기</h2><p class="prose">tip~total_bill+size+day의 계수표를 읽습니다. total_bill 계수는 인원수와 요일이 같다고 놓았을 때의 조건부 연관성입니다. daySat 계수는 같은 금액·인원의 Sun과 비교한 차이입니다. 절편은 자료에서 현실적인 조건인지 따져 봅니다.</p></section><section id="step-7"><h2>기본 실습 3 · 변수를 더 넣으면 무조건 좋아질까</h2><p class="prose">sex+smoker+time을 추가한 모형의 R제곱과 수정 R제곱을 비교합니다. R제곱이 조금 커졌다는 이유만으로 좋은 모형이라고 결론 내리지 않습니다. 더미열 VIF도 확인하되 개별 더미의 지표이며 요일 전체의 일반화 VIF와 같지 않음을 구별합니다.</p></section><section id="step-8"><h2>기본 실습 4 · 장말 과제: 이분산에 대응</h2><p class="prose">잔차 그림에서 예측값에 따라 흩어짐이 달라지는지 봅니다. hc3.csv에서 보통 표준오차와 HC3 표준오차를 비교합니다. HC3는 오차 크기가 일정하지 않을 때 추론의 민감도를 살피는 방법입니다. 계수를 바꾸거나 빠진 변수, 비선형 관계, 인과 문제를 해결해 주는 버튼은 아닙니다.</p></section><section id="step-9"><h2>실행 코드 · 번호별로 읽고 실행하기</h2><button type="button" class="copy-code">코드 복사</button><pre><code>---
+title: &quot;6장 식사금액과 팁 분석 리포트&quot;
+subtitle: &quot;학생 작성용 · 조건부 연관성과 예측의 한계&quot;
+author:
+  - name: &quot;학번 이름&quot;
+    affiliation: &quot;세종대학교&quot;
+date: today
+lang: ko
 
-기준 출력은 먼저 자신의 결과를 만든 뒤 대조하세요.</p><a class="file" href="/dataAnalytics/downloads/ff742aac0104ee54-lab-ch06.zip" download>lab-ch06.zip ↓<small>209 KB · 교재 6장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html</small></a></section><section id="step-5"><h2>기본 실습 1 · 질문과 단위를 먼저 기록</h2><p class="prose">산점도와 요약을 보고 단순모형 tip~total_bill을 생각합니다. 이번 종속변수는 팁 비율이 아니라 팁 금액입니다. tips를 읽은 뒤 day의 기준을 Sun으로 지정했는지 확인합니다.</p></section><section id="step-6"><h2>기본 실습 2 · 교재 모형의 계수 읽기</h2><p class="prose">tip~total_bill+size+day의 계수표를 읽습니다. total_bill 계수는 인원수와 요일이 같다고 놓았을 때의 조건부 연관성입니다. daySat 계수는 같은 금액·인원의 Sun과 비교한 차이입니다. 절편은 자료에서 현실적인 조건인지 따져 봅니다.</p></section><section id="step-7"><h2>기본 실습 3 · 변수를 더 넣으면 무조건 좋아질까</h2><p class="prose">sex+smoker+time을 추가한 모형의 R제곱과 수정 R제곱을 비교합니다. R제곱이 조금 커졌다는 이유만으로 좋은 모형이라고 결론 내리지 않습니다. 더미열 VIF도 확인하되 개별 더미의 지표이며 요일 전체의 일반화 VIF와 같지 않음을 구별합니다.</p></section><section id="step-8"><h2>기본 실습 4 · 장말 과제: 이분산에 대응</h2><p class="prose">잔차 그림에서 예측값에 따라 흩어짐이 달라지는지 봅니다. hc3.csv에서 보통 표준오차와 HC3 표준오차를 비교합니다. HC3는 오차 크기가 일정하지 않을 때 추론의 민감도를 살피는 방법입니다. 계수를 바꾸거나 빠진 변수, 비선형 관계, 인과 문제를 해결해 주는 버튼은 아닙니다.</p></section><section id="step-9"><h2>실행 코드 · 번호별로 읽고 실행하기</h2><button type="button" class="copy-code">코드 복사</button><pre><code># 결과를 output 폴더에 저장합니다. 원본 data 파일은 바꾸지 않습니다.
-options(digits=7)
-dir.create(&quot;output&quot;,showWarnings=FALSE)
-read_data &lt;- function(name) read.csv(file.path(&quot;data&quot;,name),fileEncoding=&quot;UTF-8-BOM&quot;,check.names=FALSE,stringsAsFactors=FALSE)
-export &lt;- function(x,name) { print(x); write.csv(x,file.path(&quot;output&quot;,paste0(name,&quot;.csv&quot;)),row.names=FALSE) }
-coef_table &lt;- function(m) { z &lt;- coef(summary(m)); ci &lt;- confint(m); data.frame(term=rownames(z),estimate=z[,1],se=z[,2],p=z[,4],low=ci[,1],high=ci[,2],row.names=NULL) }
-summary_by &lt;- function(x,g) do.call(rbind,lapply(split(x,g),function(y) data.frame(n=length(y),mean=mean(y),median=median(y),sd=sd(y),IQR=IQR(y))))
-picture &lt;- function(name,w=1100,h=720) png(file.path(&quot;output&quot;,paste0(name,&quot;.png&quot;)),width=w,height=h,res=120)
-sink(&quot;output/results.txt&quot;,split=TRUE)
-# 1. 6.10: tips는 R 기본 내장자료가 아닌 reshape2 배포자료입니다.
-d &lt;- read_data(&quot;tips.csv&quot;); stopifnot(nrow(d)==244,!anyNA(d))
-d$day &lt;- factor(d$day,levels=c(&quot;Sun&quot;,&quot;Thur&quot;,&quot;Fri&quot;,&quot;Sat&quot;))
-print(summary(d)); print(table(d$day))
-simple &lt;- lm(tip~total_bill,data=d)
-model &lt;- lm(tip~total_bill+size+day,data=d)
-expanded &lt;- lm(tip~total_bill+size+day+sex+smoker+time,data=d)
-export(coef_table(model),&quot;coefficients&quot;)
-export(data.frame(model=c(&quot;simple&quot;,&quot;chapter-model&quot;,&quot;expanded&quot;),r2=sapply(list(simple,model,expanded),function(m) summary(m)$r.squared),adjusted_r2=sapply(list(simple,model,expanded),function(m) summary(m)$adj.r.squared)),&quot;fit-comparison&quot;)
-picture(&quot;bill-tip&quot;)
-plot(d$total_bill,d$tip,pch=16,col=&quot;#236b6660&quot;,xlab=&quot;Total bill (USD)&quot;,ylab=&quot;Tip (USD)&quot;)
-abline(simple,col=&quot;#c26c35&quot;,lwd=2); dev.off()
-# 2. 잔차 진단과 다중공선성. 범주형은 더미열별 R제곱으로 확인합니다.
-picture(&quot;diagnostics&quot;,1200,850); par(mfrow=c(2,2)); plot(model); dev.off()
+format:
+  html:
+    format-links: false
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    smooth-scroll: true
+    code-fold: true
+    code-tools: true
+    code-copy: true
+    theme:
+      light: cosmo
+      dark: darkly
+    css: styles.css
+    embed-resources: true
+
+  pdf:
+    documentclass: scrartcl
+    toc: true
+    number-sections: true
+    keep-tex: false
+    colorlinks: true
+    geometry:
+      - top=22mm
+      - bottom=22mm
+      - left=24mm
+      - right=24mm
+    include-in-header:
+      text: |
+        \usepackage{kotex}
+        \usepackage{booktabs}
+        \usepackage{longtable}
+        \usepackage{float}
+        \usepackage{xcolor}
+        \definecolor{Accent}{HTML}{17365D}
+        \setkomafont{section}{\color{Accent}\Large\bfseries}
+        \setkomafont{subsection}{\color{Accent}\large\bfseries}
+
+  docx:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    reference-doc: reference.docx
+
+execute:
+  echo: true
+  warning: false
+  message: false
+  freeze: false
+  cache: false
+  error: false
+
+filters:
+  - pagebreak.lua
+---
+
+```{r}
+#| label: setup
+#| include: false
+# 0. 공통 설정: 보고서의 R 청크만으로 실행합니다.
+options(digits = 7, scipen = 999)
+dir.create(&quot;output&quot;, showWarnings = FALSE)
+fmt &lt;- function(x, digits = 3) formatC(x, digits = digits, format = &quot;f&quot;)
+show_table &lt;- function(x, caption, digits = 3) {
+  knitr::kable(x, digits = digits, caption = caption, row.names = FALSE)
+}
+export &lt;- function(x, name) {
+  write.csv(x, file.path(&quot;output&quot;, paste0(name, &quot;.csv&quot;)), row.names = FALSE)
+  x
+}
+coef_table &lt;- function(m) {
+  z &lt;- coef(summary(m)); ci &lt;- confint(m)
+  data.frame(term = rownames(z), estimate = z[, 1], se = z[, 2], p = z[, 4],
+             low = ci[, 1], high = ci[, 2], row.names = NULL)
+}
+```
+
+
+
+::: {.hero}
+# Executive One-Page Proposal {.unnumbered}
+
+**학생 작성용** · 아래 번호별 R 청크를 실행하고 자신의 판단을 작성합니다.
+QMD의 코드를 수정하면 다음 렌더링에 반영됩니다. 첫 페이지는 본문 분석을 마친 뒤 작성합니다.
+:::
+
+::: {.result-box}
+## 1. Bottom Line {.unnumbered}
+
+[식사금액 계수의 방향·크기·단위와 조건을 포함해 한 문장으로 쓰세요. 인과효과라고 단정하지 않습니다.]
+:::
+
+## 2. Decision / Recommendation {.unnumbered}
+
+1. [분석 결과를 사용할 의사결정을 쓰세요.]
+2. [실행 전 추가로 확인할 자료나 조건을 쓰세요.]
+3. [실행을 보류하거나 중단할 조건을 쓰세요.]
+
+## 3. Key Evidence {.unnumbered}
+
+| 직접 선택한 핵심 근거 | 실행 결과 | 단위·비교 조건 |
+| --- | --- | --- |
+| [근거 1] | [값] | [조건] |
+| [근거 2] | [값] | [조건] |
+| [근거 3] | [값] | [조건] |
+
+[아래 분석 결과 중 자신의 판단을 뒷받침하는 근거 3~5개를 선택하세요.]
+
+## 4. Managerial / Practical Implication {.unnumbered}
+
+[같은 인원수와 요일이라는 조건을 설명하고, 이 결과를 활용할 대상과 적용 범위를 쓰세요.]
+
+## 5. Risk / Limitation {.unnumbered}
+
+[관찰자료의 인과해석 한계와 단일 테이블 예측의 불확실성을 각각 한 문장으로 쓰세요.]
+
+::: {.pagebreak}
+:::
+
+# 연구문제
+
+[평가할 의사결정과 연구질문을 자신의 말로 쓰세요. 종속변수가 팁 금액인지 팁 비율인지 명확히 구분하세요.]
+
+**작성 질문:** 누구의 어떤 의사결정을 돕는 분석인가요? 종속변수는 팁 금액과 팁 비율 중 무엇인가요?
+
+교재 연결: 박광민, 『비즈니스 애널리틱스』 6장, 6.1~6.10.
+상세 자료 이력은 ZIP의 `source-provenance.txt`에서 확인합니다.
+
+# 데이터
+
+## 1. 데이터 불러오기와 변수 정의
+
+```{r}
+#| label: load-data
+# 1. 한 행은 식사 계산서 기록입니다. 금액 단위는 USD입니다.
+d &lt;- read.csv(&quot;data/tips.csv&quot;, fileEncoding = &quot;UTF-8-BOM&quot;,
+              check.names = FALSE, stringsAsFactors = FALSE)
+d$day &lt;- factor(d$day, levels = c(&quot;Sun&quot;, &quot;Thur&quot;, &quot;Fri&quot;, &quot;Sat&quot;))
+show_table(head(d, 6), &quot;입력 자료의 첫 6행&quot;)
+```
+
+**학생 작성:** [자료 출처, 한 행의 의미, 분석 범위, 종속변수와 설명변수의 단위를 쓰세요.]
+
+## 2. 분석 전에 데이터 점검
+
+```{r}
+#| label: validate-data
+# 2. 지정 자료의 행 수와 결측을 검산합니다. 실패하면 원자료를 먼저 확인합니다.
+stopifnot(nrow(d) == 244, !anyNA(d))
+show_table(data.frame(
+  점검 = c(&quot;행 수&quot;, &quot;열 수&quot;, &quot;결측값 수&quot;, &quot;동일한 전체 행 수&quot;),
+  값 = c(nrow(d), ncol(d), sum(is.na(d)), sum(duplicated(d)))
+), &quot;분석 입력 점검&quot;)
+```
+
+**판단 질문:** 동일한 전체 행은 중복 수집을 뜻하나요? 한 식당의 기록을 다른 식당에도 적용할 수 있나요?
+
+**학생 작성:** [추가로 확인할 점과 분석을 진행하거나 보류할 이유를 쓰세요.]
+
+# 기술통계
+
+## 3. 전체 분포와 요일별 비교
+
+```{r}
+#| label: descriptive-results
+# 3. 평균만 보지 않고 산포·범위·집단별 표본 수도 확인합니다.
+numeric_vars &lt;- c(&quot;total_bill&quot;, &quot;tip&quot;, &quot;size&quot;)
+desc &lt;- do.call(rbind, lapply(numeric_vars, function(v) {
+  x &lt;- d[[v]]
+  data.frame(변수 = v, 기록수 = length(x), 평균 = mean(x), 표준편차 = sd(x),
+             최소 = min(x), 최대 = max(x))
+}))
+show_table(desc, &quot;주요 변수의 기술통계&quot;)
+by_day &lt;- do.call(rbind, lapply(levels(d$day), function(day) {
+  x &lt;- d[d$day == day, ]
+  data.frame(요일 = day, 기록수 = nrow(x), 평균식사금액 = mean(x$total_bill),
+             평균팁 = mean(x$tip), 팁표준편차 = sd(x$tip))
+}))
+show_table(by_day, &quot;요일별 기록 수와 평균 (금액: USD)&quot;)
+```
+
+[식사금액과 팁의 평균·표준편차·범위, 요일별 표본 수를 근거로 비교 대상을 설명하세요.]
+
+**판단 질문:** 어떤 비교가 필요하나요? 평균 차이의 원인을 이 표만으로 설명할 수 있나요?
+
+# 시각화
+
+## 4. 식사금액과 팁의 관계 탐색
+
+```{r}
+#| label: fig-bill-tip
+#| fig-cap: &quot;식사금액과 팁의 산점도 · 선은 단순회귀&quot;
+#| out-width: 95%
+# 4. 축의 단위와 관측의 흩어짐을 확인합니다.
+simple &lt;- lm(tip ~ total_bill, data = d)
+png(&quot;output/bill-tip.png&quot;, width = 1100, height = 720, res = 120)
+plot(d$total_bill, d$tip, pch = 16, col = &quot;#236b6660&quot;,
+     xlab = &quot;Total bill (USD)&quot;, ylab = &quot;Tip (USD)&quot;)
+abline(simple, col = &quot;#c26c35&quot;, lwd = 2)
+invisible(dev.off())
+knitr::include_graphics(&quot;output/bill-tip.png&quot;)
+```
+
+**학생 작성:** [방향·산포·예외적 기록을 설명하고, 이 그림으로 알 수 없는 내용을 쓰세요.]
+
+# 통계분석
+
+## 5. 단순회귀와 인원수·요일을 고려한 모형
+
+```{r}
+#| label: regression-models
+# 5. 모형식은 이곳에서 수정합니다. Sun은 요일의 기준범주입니다.
+simple &lt;- lm(tip ~ total_bill, data = d)
+model &lt;- lm(tip ~ total_bill + size + day, data = d)
+show_table(coef_table(simple), &quot;단순모형 계수와 95% 신뢰구간&quot;)
+coefficients &lt;- export(coef_table(model), &quot;coefficients&quot;)
+show_table(coefficients, &quot;인원수·요일을 고려한 모형 계수&quot;)
+bill &lt;- coefficients[coefficients$term == &quot;total_bill&quot;, ]
+size_effect &lt;- coefficients[coefficients$term == &quot;size&quot;, ]
+```
+
+열 `estimate`는 계수, `se`는 보통 표준오차, `p`는 양측 p값,
+`low`와 `high`는 보통 표준오차에 따른 95% 신뢰구간입니다.
+
+**방법 선택:** [이 설명변수와 기준범주를 선택한 이유를 쓰세요. 단순모형과 다중모형이 답하는 질문을 구분하세요.]
+
+## 6. 설명변수 추가와 모형 비교
+
+```{r}
+#| label: model-comparison
+# 6. 변수 추가로 바뀌는 지표를 직접 비교합니다.
+expanded &lt;- lm(tip ~ total_bill + size + day + sex + smoker + time, data = d)
+models &lt;- list(simple, model, expanded)
+fit &lt;- export(data.frame(
+  model = c(&quot;simple&quot;, &quot;chapter-model&quot;, &quot;expanded&quot;),
+  r2 = sapply(models, function(m) summary(m)$r.squared),
+  adjusted_r2 = sapply(models, function(m) summary(m)$adj.r.squared)
+), &quot;fit-comparison&quot;)
+show_table(fit, &quot;표본 안의 모형 설명력 비교&quot;, 4)
+```
+
+**판단 질문:** 모형을 선택할 때 어떤 지표와 조건을 사용할까요? 새 자료의 예측 성능은 어떻게 확인해야 할까요?
+
+**학생 작성:** [선택할 모형, 근거와 남은 검증 과제를 쓰세요.]
+
+# 결과 해석
+
+[total_bill과 size 계수 2개를 단위와 조건을 포함해 해석하세요. daySat의 비교 기준도 쓰세요.]
+
+**점검 질문:** 계수의 단위와 비교 조건을 썼나요? p값·효과 크기·실무적 의미를 구분했나요?
+
+# 추가 진단
+
+## 7. 잔차와 다중공선성 점검
+
+```{r}
+#| label: fig-diagnostics
+#| fig-cap: &quot;선택한 모형의 잔차·정규성·분산·영향력 진단&quot;
+#| out-width: 100%
+# 7. 진단할 모형을 바꾸면 이 청크의 model도 확인합니다.
+png(&quot;output/diagnostics.png&quot;, width = 1200, height = 850, res = 120)
+par(mfrow = c(2, 2))
+plot(model)
+invisible(dev.off())
+knitr::include_graphics(&quot;output/diagnostics.png&quot;)
 X &lt;- model.matrix(model)
-vifs &lt;- sapply(2:ncol(X),function(j) 1/(1-summary(lm(X[,j]~X[,-c(1,j),drop=FALSE]))$r.squared))
-export(data.frame(term=colnames(X)[-1],vif=vifs),&quot;dummy-vif&quot;)
-# 3. 교재 장말 과제: 이분산에 민감한 표준오차를 HC3와 비교
-bread &lt;- solve(crossprod(X)); weights &lt;- residuals(model)^2/(1-hatvalues(model))^2
-hc3 &lt;- bread %*% crossprod(X,X*weights) %*% bread
-se &lt;- sqrt(diag(hc3)); tcrit &lt;- qt(.975,df.residual(model))
-export(data.frame(term=names(coef(model)),estimate=coef(model),usual_se=coef(summary(model))[,2],hc3_se=se,hc3_low=coef(model)-tcrit*se,hc3_high=coef(model)+tcrit*se),&quot;hc3&quot;)
-# 4. 심화: 평균의 신뢰구간과 한 테이블의 예측구간은 다릅니다.
-new &lt;- data.frame(total_bill=20,size=2,day=factor(&quot;Sun&quot;,levels=levels(d$day)))
-export(data.frame(interval=c(&quot;mean-confidence&quot;,&quot;individual-prediction&quot;),rbind(predict(model,new,interval=&quot;confidence&quot;),predict(model,new,interval=&quot;prediction&quot;))),&quot;prediction-intervals&quot;)
-cat(&quot;Intervals above use the ordinary lm assumptions; inspect heteroskedasticity before relying on their width.
-&quot;)
+vifs &lt;- sapply(2:ncol(X), function(j) {
+  1 / (1 - summary(lm(X[, j] ~ X[, -c(1, j), drop = FALSE]))$r.squared)
+})
+show_table(export(data.frame(term = colnames(X)[-1], vif = vifs), &quot;dummy-vif&quot;),
+           &quot;설계행렬의 개별 더미열 VIF&quot;)
+```
 
-sink()
-capture.output(sessionInfo(),file=&quot;output/session-info.txt&quot;)
-</code></pre><a class="file" href="/dataAnalytics/downloads/d31327116e0c9009-analysis.R" download>analysis.R ↓<small>3 KB · 교재 6장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html</small></a></section><section id="step-10"><h2>실제로 실행한 기준 출력</h2><p class="prose">표의 값은 제공된 R 코드 실행 결과입니다. 전체 수치와 그림은 아래 파일 및 ZIP의 reference-output에서 확인합니다. 그림의 글꼴은 운영체제에 따라 달라질 수 있습니다.</p><div class="rich"><table><tr><th><p>model</p></th><th><p>r2</p></th><th><p>adjusted_r2</p></th></tr><tr><td><p>simple</p></td><td><p>0.45662</p></td><td><p>0.45437</p></td></tr><tr><td><p>chapter-model</p></td><td><p>0.46915</p></td><td><p>0.45799</p></td></tr><tr><td><p>expanded</p></td><td><p>0.47008</p></td><td><p>0.45204</p></td></tr></table></div><figure><img src="/dataAnalytics/downloads/cd47d37601c3c687-diagnostics.png" alt="실제로 실행한 기준 출력"><figcaption>교재 6장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html</figcaption></figure><a class="file" href="/dataAnalytics/downloads/cd47d37601c3c687-diagnostics.png" download>diagnostics.png ↓<small>176 KB · 교재 6장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html</small></a><a class="file" href="/dataAnalytics/downloads/7a4f99fac3823dc0-prediction-intervals.csv" download>prediction-intervals.csv ↓<small>1 KB · 교재 6장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html</small></a><a class="file" href="/dataAnalytics/downloads/cec8586cf985db26-session-info.txt" download>session-info.txt ↓<small>1 KB · 교재 6장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html</small></a><a class="file" href="/dataAnalytics/downloads/4f490c139b37d24e-fit-comparison.csv" download>fit-comparison.csv ↓<small>1 KB · 교재 6장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html</small></a><a class="file" href="/dataAnalytics/downloads/2468497addfbd7ea-results.txt" download>results.txt ↓<small>3 KB · 교재 6장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html</small></a><a class="file" href="/dataAnalytics/downloads/fe293633a285c121-coefficients.csv" download>coefficients.csv ↓<small>1 KB · 교재 6장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html</small></a><figure><img src="/dataAnalytics/downloads/ebc0bcd8e9a1fda1-bill-tip.png" alt="실제로 실행한 기준 출력"><figcaption>교재 6장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html</figcaption></figure><a class="file" href="/dataAnalytics/downloads/ebc0bcd8e9a1fda1-bill-tip.png" download>bill-tip.png ↓<small>32 KB · 교재 6장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html</small></a><a class="file" href="/dataAnalytics/downloads/317f65dbdbc72200-dummy-vif.csv" download>dummy-vif.csv ↓<small>1 KB · 교재 6장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html</small></a><a class="file" href="/dataAnalytics/downloads/d62ebbf958247207-hc3.csv" download>hc3.csv ↓<small>1 KB · 교재 6장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html</small></a></section><section id="step-11"><h2>멈추고 해석하기</h2><p class="prose">교재 모형의 total_bill 계수는 약 0.093, size는 약 0.187입니다. “다른 조건이 같을 때 식사금액 1달러 차이는 평균 팁 약 0.093달러 차이와 연결된다”처럼 씁니다. 기본 종합모형 R²≈0.4691, 수정 R²≈0.4580이며 변수를 더 넣으면 R²≈0.4701이지만 수정 R²≈0.4520입니다. 새 고객에 대한 예측 정확도가 좋아졌다고 확인한 것은 아닙니다.</p></section><section id="step-12"><h2>AI와 함께 확인하기</h2><p class="prose">“tip~total_bill+size+day에서 Sun을 기준으로 했다. total_bill 계수를 조건부 연관성으로 설명하고, HC3 표준오차와 계수의 차이를 알려줘. 높은 R²나 낮은 p값만으로 인과·예측 성능을 주장하지 마.” 실제 계수표와 다른 수치를 쓰면 원자료 없이 추정했는지 확인합니다.
+VIF 표는 설계행렬의 개별 더미열 지표입니다. 요일 전체의 일반화 VIF와 구분합니다.
+
+[잔차 그림에서 실제로 보이는 패턴과 HC3 비교를 연결하세요. 점검하지 않은 가정을 충족했다고 쓰지 않습니다.]
+
+# 강건성 검토
+
+## 8. HC3 표준오차 비교
+
+```{r}
+#| label: hc3-comparison
+# 8. 계수는 유지하고 표준오차와 구간의 민감도를 비교합니다.
+X &lt;- model.matrix(model)
+bread &lt;- solve(crossprod(X))
+weights &lt;- residuals(model)^2 / (1 - hatvalues(model))^2
+hc3 &lt;- bread %*% crossprod(X, X * weights) %*% bread
+se &lt;- sqrt(diag(hc3))
+tcrit &lt;- qt(.975, df.residual(model))
+hc3_results &lt;- export(data.frame(
+  term = names(coef(model)), estimate = coef(model),
+  usual_se = coef(summary(model))[, 2], hc3_se = se,
+  hc3_low = coef(model) - tcrit * se, hc3_high = coef(model) + tcrit * se
+), &quot;hc3&quot;)
+show_table(hc3_results, &quot;보통 표준오차와 HC3 표준오차 비교&quot;)
+```
+
+HC3 구간은 잔차 자유도의 t 임계값을 사용하는 이 실습의 계산 방식입니다.
+
+[변수 추가와 HC3 표준오차 비교 중 무엇이 바뀌고 무엇이 유지되는지 쓰세요. 검증용 새 자료 없이 예측 성능 개선을 주장하지 않습니다.]
+
+**판단 질문:** 달라진 수치 때문에 자신의 해석이나 선택을 바꿔야 하나요? 이 계산으로 해결되지 않는 문제는 무엇인가요?
+
+# 결론
+
+### 무엇을 발견했는가?
+
+[핵심 수치와 조건을 근거로 2~3문장으로 쓰세요.]
+
+### 그래서 무엇을 해야 하는가?
+
+[사용할 분석 결과, 실행 조건과 확인할 지표를 쓰세요.]
+
+### 무엇을 아직 모르는가?
+
+[인과관계와 새 식당·기간에 대한 적용 가능성을 쓰세요.]
+
+**첫 페이지로 돌아가기:** 핵심 근거를 직접 선택하고 결론·권고·적용 조건·한계를 자신의 말로 작성하세요.
+
+# 재현성 체크리스트
+
+- [ ] 새 R 세션에서 QMD의 청크를 위에서 아래로 실행하고 HTML을 렌더링했다.
+- [ ] 원자료를 덮어쓰지 않았고 행 수·변수 단위를 확인했다.
+- [ ] 모형 선택 이유와 기준범주를 설명했다.
+- [ ] 계수·구간·p값과 실무적 의미를 구분했다.
+- [ ] 진단 결과와 HC3 비교를 근거로 판단을 작성했다.
+- [ ] 첫 페이지의 숫자가 본문의 실제 실행 결과와 일치한다.
+- [ ] AI를 사용했다면 제안과 직접 검증한 결과를 구분했다.
+
+## AI 사용 기록 {.unnumbered}
+
+[미사용 또는 질문·제안·직접 검증·수정사항을 씁니다.]
+
+# Appendix A. 평균과 다음 한 테이블의 범위 {.unnumbered}
+
+```{r}
+#| label: prediction-intervals
+# 9. 새로운 조건을 정하고 두 종류의 구간을 비교합니다.
+new &lt;- data.frame(total_bill = 20, size = 2,
+                  day = factor(&quot;Sun&quot;, levels = levels(d$day)))
+mean_ci &lt;- predict(model, new, interval = &quot;confidence&quot;)
+individual_pi &lt;- predict(model, new, interval = &quot;prediction&quot;)
+intervals &lt;- export(data.frame(
+  interval = c(&quot;mean-confidence&quot;, &quot;individual-prediction&quot;),
+  rbind(mean_ci, individual_pi)
+), &quot;prediction-intervals&quot;)
+show_table(intervals, &quot;20달러·2인·일요일의 팁 금액 구간 (USD)&quot;)
+```
+
+[두 구간의 폭을 계산하고 왜 다른지 설명하세요. 직원 보상과 예산 계획에 필요한 구간을 구분하고, 새 기간 자료로 검증할 계획을 쓰세요.]
+
+# Appendix B. 렌더링과 실행 환경 {.unnumbered}
+
+처음 한 번 `install.packages(c(&quot;knitr&quot;, &quot;rmarkdown&quot;))`로 패키지를 준비합니다.
+ZIP을 풀고 `report-template.qmd`를 RStudio 또는 VS Code에서 열어 번호별 청크를 실행합니다.
+코드와 해석을 수정한 뒤 아래 명령으로 제출용 HTML을 생성합니다.
+
+```bash
+quarto render report-template.qmd --to html
+quarto render report-template.qmd --to docx
+quarto render report-template.qmd --to pdf
+```
+
+이 QMD 안의 R 청크가 분석 코드의 본문입니다. 별도 `analysis.R` 실행은 필요하지 않습니다.
+데이터와 `styles.css`, `pagebreak.lua`, `reference.docx`는 같은 ZIP에 포함됩니다.
+PDF는 한국어 LaTeX 환경이 필요합니다. 공식 제출은 집현캠퍼스 안내를 따릅니다.
+
+```{r}
+#| label: session-info
+#| echo: false
+sessionInfo()
+```
+</code></pre><a class="file" href="/dataAnalytics/downloads/b34a4ffe8712a217-report-template.qmd" download>report-template.qmd ↓<small>14 KB · 교재 6장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html</small></a></section><section id="step-10"><h2>실제로 실행한 기준 출력</h2><p class="prose">표의 값은 제공된 R 코드 실행 결과입니다. 전체 수치와 그림은 아래 파일 및 ZIP의 reference-output에서 확인합니다. 그림의 글꼴은 운영체제에 따라 달라질 수 있습니다.</p><div class="rich"><table><tr><th><p>model</p></th><th><p>r2</p></th><th><p>adjusted_r2</p></th></tr><tr><td><p>simple</p></td><td><p>0.45662</p></td><td><p>0.45437</p></td></tr><tr><td><p>chapter-model</p></td><td><p>0.46915</p></td><td><p>0.45799</p></td></tr><tr><td><p>expanded</p></td><td><p>0.47008</p></td><td><p>0.45204</p></td></tr></table></div><figure><img src="/dataAnalytics/downloads/cd47d37601c3c687-diagnostics.png" alt="실제로 실행한 기준 출력"><figcaption>교재 6장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html</figcaption></figure><a class="file" href="/dataAnalytics/downloads/cd47d37601c3c687-diagnostics.png" download>diagnostics.png ↓<small>176 KB · 교재 6장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html</small></a><a class="file" href="/dataAnalytics/downloads/7a4f99fac3823dc0-prediction-intervals.csv" download>prediction-intervals.csv ↓<small>1 KB · 교재 6장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html</small></a><a class="file" href="/dataAnalytics/downloads/cec8586cf985db26-session-info.txt" download>session-info.txt ↓<small>1 KB · 교재 6장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html</small></a><a class="file" href="/dataAnalytics/downloads/4f490c139b37d24e-fit-comparison.csv" download>fit-comparison.csv ↓<small>1 KB · 교재 6장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html</small></a><a class="file" href="/dataAnalytics/downloads/2468497addfbd7ea-results.txt" download>results.txt ↓<small>3 KB · 교재 6장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html</small></a><a class="file" href="/dataAnalytics/downloads/fe293633a285c121-coefficients.csv" download>coefficients.csv ↓<small>1 KB · 교재 6장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html</small></a><figure><img src="/dataAnalytics/downloads/ebc0bcd8e9a1fda1-bill-tip.png" alt="실제로 실행한 기준 출력"><figcaption>교재 6장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html</figcaption></figure><a class="file" href="/dataAnalytics/downloads/ebc0bcd8e9a1fda1-bill-tip.png" download>bill-tip.png ↓<small>32 KB · 교재 6장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html</small></a><a class="file" href="/dataAnalytics/downloads/317f65dbdbc72200-dummy-vif.csv" download>dummy-vif.csv ↓<small>1 KB · 교재 6장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html</small></a><a class="file" href="/dataAnalytics/downloads/d62ebbf958247207-hc3.csv" download>hc3.csv ↓<small>1 KB · 교재 6장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html</small></a></section><section id="step-11"><h2>멈추고 해석하기</h2><p class="prose">작성 질문: 모형 선택 이유, 계수의 조건·단위, 진단에 따른 판단 변경, 결론의 적용 범위와 한계를 자신의 말로 쓰세요.</p></section><section id="step-12"><h2>AI와 함께 확인하기</h2><p class="prose">“tip~total_bill+size+day에서 Sun을 기준으로 했다. total_bill 계수를 조건부 연관성으로 설명하고, HC3 표준오차와 계수의 차이를 알려줘. 높은 R²나 낮은 p값만으로 인과·예측 성능을 주장하지 마.” 실제 계수표와 다른 수치를 쓰면 원자료 없이 추정했는지 확인합니다.
 
 질문·제안받은 코드·직접 검증한 결과·수정한 해석을 구분해 기록합니다. AI 접속 없이도 제공된 코드와 설명으로 실습을 마칠 수 있습니다.</p></section><section id="step-13"><h2>제출할 분석 기록</h2><p class="prose">질문과 모형식, 기준범주, 계수 2개의 문장 해석, 잔차 진단, HC3 비교에서 달라진 판단을 보고합니다. “팁이 적은 직원의 서비스가 나쁘다”처럼 자료가 지지하지 않는 평가를 피합니다.
 
@@ -58,6 +399,6 @@ capture.output(sessionInfo(),file=&quot;output/session-info.txt&quot;)
 스스로 확인: 팁 금액과 팁 비율을 구별했는가? 표준오차 수정이 인과효과를 만들어주지 않음을 설명했는가?</p></section><section id="step-14"><h2>막혔을 때 확인할 순서</h2><details><summary>오류와 확인 순서 펼치기</summary><p class="prose">파일 오류: getwd()와 list.files(&quot;data&quot;) 확인 → ZIP 압축 해제 → 작업 폴더 확인.
 열 이름 오류: names()와 원본 UTF-8 인코딩 확인.
 stopifnot 실패: 행 수·결측·범위 확인. 검사를 지워서 통과시키지 않기.
-값 차이: 원본 파일 → 분석 대상/기준범주 → 시드 → R/패키지 버전 순서로 비교.</p></details><p><a class="button" href="/dataAnalytics/ai/?lab=lab-ch06">AI Tutor에게 질문하기</a></p></section><section id="step-15"><h2>보고서 틀과 검산용 해설</h2><p class="prose">report-template.qmd에 자신의 판단을 씁니다. reference-report.qmd는 기준 해석입니다. Quarto에서 Render하면 HTML 보고서를 만들 수 있습니다.</p><a class="file" href="/dataAnalytics/downloads/8532e7964912b102-report-template.qmd" download>report-template.qmd ↓<small>2 KB · 교재 6장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html</small></a><a class="file" href="/dataAnalytics/downloads/e3fae22d228c3251-reference-report.qmd" download>reference-report.qmd ↓<small>3 KB · 교재 6장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html</small></a><a class="file" href="/dataAnalytics/downloads/b50a29422d544b1d-README.md" download>README.md ↓<small>7 KB · 교재 6장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html</small></a></section><section id="step-16"><h2>교재와 자료 출처</h2><p class="prose">교재 6장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html
+값 차이: 원본 파일 → 분석 대상/기준범주 → 시드 → R/패키지 버전 순서로 비교.</p></details><p><a class="button" href="/dataAnalytics/ai/?lab=lab-ch06">AI Tutor에게 질문하기</a></p></section><section id="step-15"><h2>보고서 틀과 검산용 해설</h2><p class="prose">report-template.qmd에 자신의 판단을 씁니다. reference-report.qmd는 기준 해석입니다. 6장 시범본: 전체 ZIP을 풀고 knitr·rmarkdown을 준비한 뒤 quarto render report-template.qmd --to html을 실행합니다. QMD 안의 번호별 R 청크를 읽고 수정·실행합니다. 표와 그림은 계산되고, 판단·해석은 학생이 직접 작성합니다. 원본 styles.css·pagebreak.lua·reference.docx를 같은 폴더에 둡니다. 학생용은 해석 작성란, 교수자용은 예시 해석을 제공합니다.</p><a class="file" href="/dataAnalytics/downloads/b34a4ffe8712a217-report-template.qmd" download>report-template.qmd ↓<small>14 KB · 교재 6장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html</small></a><a class="file" href="/dataAnalytics/downloads/9b7d99bcba44152c-reference-report.qmd" download>reference-report.qmd ↓<small>20 KB · 교재 6장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html</small></a><a class="file" href="/dataAnalytics/downloads/a2e39f348f70abf3-README.md" download>README.md ↓<small>9 KB · 교재 6장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html</small></a></section><section id="step-16"><h2>교재와 자료 출처</h2><p class="prose">교재 6장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter6.html
 교수 제공 원본, 공개 생성식 재현, 내장자료는 장별 데이터 설명과 ZIP의 source-provenance.txt에 구분했습니다.</p></section><section id="step-17"><h2>마지막 심화 실습</h2><p class="prose">심화 — 평균의 범위와 다음 고객의 범위는 다르다
 20달러·2인·일요일의 평균 팁 신뢰구간과 개별 테이블 예측구간을 비교합니다. 왜 후자가 넓은지 설명하세요. 제공된 predict 구간은 보통 lm 가정에 따른 구간이며 이분산을 자동 교정하지 않습니다. 직원 보상이나 예산 계획에 어느 구간이 필요한지 정하고, 새 기간 자료로 어떤 검증을 할지 설계합니다.</p></section><section><h2>출처와 다음 행동</h2><p><a href="https://kwangminpark.github.io/businessAnalytics/Chapter6.html" rel="noopener noreferrer">교재 6장 · 회귀분석: 통계의 꽃</a></p><p>실행한 코드와 결과, 결과를 설명하는 README를 자신의 분석 프로젝트에 기록하세요. 공식 제출은 집현캠퍼스의 안내를 따르세요.</p></section></article></div></main><footer>공식 제출·평가는 집현캠퍼스에서 진행합니다. 이 사이트의 자기점검은 학습용입니다.</footer></body></html><script type="module">document.querySelectorAll(`.copy-code`).forEach(e=>e.addEventListener(`click`,async()=>{try{await navigator.clipboard.writeText(e.nextElementSibling?.textContent||``),e.textContent=`복사됨`}catch{e.textContent=`코드를 선택해서 복사하세요`}})),document.querySelectorAll(`.quiz`).forEach(e=>e.querySelectorAll(`button`).forEach(t=>t.addEventListener(`click`,()=>{e.querySelector(`.quiz-result`).textContent=t.dataset.option===e.dataset.answer?`맞습니다. 본문의 해석과 근거를 다시 연결해 보세요.`:`다시 생각해 보세요. 본문의 조건과 해석을 확인하세요.`})));</script>

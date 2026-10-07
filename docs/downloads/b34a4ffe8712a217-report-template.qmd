@@ -1,0 +1,382 @@
+---
+title: "6장 식사금액과 팁 분석 리포트"
+subtitle: "학생 작성용 · 조건부 연관성과 예측의 한계"
+author:
+  - name: "학번 이름"
+    affiliation: "세종대학교"
+date: today
+lang: ko
+
+format:
+  html:
+    format-links: false
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    smooth-scroll: true
+    code-fold: true
+    code-tools: true
+    code-copy: true
+    theme:
+      light: cosmo
+      dark: darkly
+    css: styles.css
+    embed-resources: true
+
+  pdf:
+    documentclass: scrartcl
+    toc: true
+    number-sections: true
+    keep-tex: false
+    colorlinks: true
+    geometry:
+      - top=22mm
+      - bottom=22mm
+      - left=24mm
+      - right=24mm
+    include-in-header:
+      text: |
+        \usepackage{kotex}
+        \usepackage{booktabs}
+        \usepackage{longtable}
+        \usepackage{float}
+        \usepackage{xcolor}
+        \definecolor{Accent}{HTML}{17365D}
+        \setkomafont{section}{\color{Accent}\Large\bfseries}
+        \setkomafont{subsection}{\color{Accent}\large\bfseries}
+
+  docx:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    reference-doc: reference.docx
+
+execute:
+  echo: true
+  warning: false
+  message: false
+  freeze: false
+  cache: false
+  error: false
+
+filters:
+  - pagebreak.lua
+---
+
+```{r}
+#| label: setup
+#| include: false
+# 0. 공통 설정: 보고서의 R 청크만으로 실행합니다.
+options(digits = 7, scipen = 999)
+dir.create("output", showWarnings = FALSE)
+fmt <- function(x, digits = 3) formatC(x, digits = digits, format = "f")
+show_table <- function(x, caption, digits = 3) {
+  knitr::kable(x, digits = digits, caption = caption, row.names = FALSE)
+}
+export <- function(x, name) {
+  write.csv(x, file.path("output", paste0(name, ".csv")), row.names = FALSE)
+  x
+}
+coef_table <- function(m) {
+  z <- coef(summary(m)); ci <- confint(m)
+  data.frame(term = rownames(z), estimate = z[, 1], se = z[, 2], p = z[, 4],
+             low = ci[, 1], high = ci[, 2], row.names = NULL)
+}
+```
+
+
+
+::: {.hero}
+# Executive One-Page Proposal {.unnumbered}
+
+**학생 작성용** · 아래 번호별 R 청크를 실행하고 자신의 판단을 작성합니다.
+QMD의 코드를 수정하면 다음 렌더링에 반영됩니다. 첫 페이지는 본문 분석을 마친 뒤 작성합니다.
+:::
+
+::: {.result-box}
+## 1. Bottom Line {.unnumbered}
+
+[식사금액 계수의 방향·크기·단위와 조건을 포함해 한 문장으로 쓰세요. 인과효과라고 단정하지 않습니다.]
+:::
+
+## 2. Decision / Recommendation {.unnumbered}
+
+1. [분석 결과를 사용할 의사결정을 쓰세요.]
+2. [실행 전 추가로 확인할 자료나 조건을 쓰세요.]
+3. [실행을 보류하거나 중단할 조건을 쓰세요.]
+
+## 3. Key Evidence {.unnumbered}
+
+| 직접 선택한 핵심 근거 | 실행 결과 | 단위·비교 조건 |
+| --- | --- | --- |
+| [근거 1] | [값] | [조건] |
+| [근거 2] | [값] | [조건] |
+| [근거 3] | [값] | [조건] |
+
+[아래 분석 결과 중 자신의 판단을 뒷받침하는 근거 3~5개를 선택하세요.]
+
+## 4. Managerial / Practical Implication {.unnumbered}
+
+[같은 인원수와 요일이라는 조건을 설명하고, 이 결과를 활용할 대상과 적용 범위를 쓰세요.]
+
+## 5. Risk / Limitation {.unnumbered}
+
+[관찰자료의 인과해석 한계와 단일 테이블 예측의 불확실성을 각각 한 문장으로 쓰세요.]
+
+::: {.pagebreak}
+:::
+
+# 연구문제
+
+[평가할 의사결정과 연구질문을 자신의 말로 쓰세요. 종속변수가 팁 금액인지 팁 비율인지 명확히 구분하세요.]
+
+**작성 질문:** 누구의 어떤 의사결정을 돕는 분석인가요? 종속변수는 팁 금액과 팁 비율 중 무엇인가요?
+
+교재 연결: 박광민, 『비즈니스 애널리틱스』 6장, 6.1~6.10.
+상세 자료 이력은 ZIP의 `source-provenance.txt`에서 확인합니다.
+
+# 데이터
+
+## 1. 데이터 불러오기와 변수 정의
+
+```{r}
+#| label: load-data
+# 1. 한 행은 식사 계산서 기록입니다. 금액 단위는 USD입니다.
+d <- read.csv("data/tips.csv", fileEncoding = "UTF-8-BOM",
+              check.names = FALSE, stringsAsFactors = FALSE)
+d$day <- factor(d$day, levels = c("Sun", "Thur", "Fri", "Sat"))
+show_table(head(d, 6), "입력 자료의 첫 6행")
+```
+
+**학생 작성:** [자료 출처, 한 행의 의미, 분석 범위, 종속변수와 설명변수의 단위를 쓰세요.]
+
+## 2. 분석 전에 데이터 점검
+
+```{r}
+#| label: validate-data
+# 2. 지정 자료의 행 수와 결측을 검산합니다. 실패하면 원자료를 먼저 확인합니다.
+stopifnot(nrow(d) == 244, !anyNA(d))
+show_table(data.frame(
+  점검 = c("행 수", "열 수", "결측값 수", "동일한 전체 행 수"),
+  값 = c(nrow(d), ncol(d), sum(is.na(d)), sum(duplicated(d)))
+), "분석 입력 점검")
+```
+
+**판단 질문:** 동일한 전체 행은 중복 수집을 뜻하나요? 한 식당의 기록을 다른 식당에도 적용할 수 있나요?
+
+**학생 작성:** [추가로 확인할 점과 분석을 진행하거나 보류할 이유를 쓰세요.]
+
+# 기술통계
+
+## 3. 전체 분포와 요일별 비교
+
+```{r}
+#| label: descriptive-results
+# 3. 평균만 보지 않고 산포·범위·집단별 표본 수도 확인합니다.
+numeric_vars <- c("total_bill", "tip", "size")
+desc <- do.call(rbind, lapply(numeric_vars, function(v) {
+  x <- d[[v]]
+  data.frame(변수 = v, 기록수 = length(x), 평균 = mean(x), 표준편차 = sd(x),
+             최소 = min(x), 최대 = max(x))
+}))
+show_table(desc, "주요 변수의 기술통계")
+by_day <- do.call(rbind, lapply(levels(d$day), function(day) {
+  x <- d[d$day == day, ]
+  data.frame(요일 = day, 기록수 = nrow(x), 평균식사금액 = mean(x$total_bill),
+             평균팁 = mean(x$tip), 팁표준편차 = sd(x$tip))
+}))
+show_table(by_day, "요일별 기록 수와 평균 (금액: USD)")
+```
+
+[식사금액과 팁의 평균·표준편차·범위, 요일별 표본 수를 근거로 비교 대상을 설명하세요.]
+
+**판단 질문:** 어떤 비교가 필요하나요? 평균 차이의 원인을 이 표만으로 설명할 수 있나요?
+
+# 시각화
+
+## 4. 식사금액과 팁의 관계 탐색
+
+```{r}
+#| label: fig-bill-tip
+#| fig-cap: "식사금액과 팁의 산점도 · 선은 단순회귀"
+#| out-width: 95%
+# 4. 축의 단위와 관측의 흩어짐을 확인합니다.
+simple <- lm(tip ~ total_bill, data = d)
+png("output/bill-tip.png", width = 1100, height = 720, res = 120)
+plot(d$total_bill, d$tip, pch = 16, col = "#236b6660",
+     xlab = "Total bill (USD)", ylab = "Tip (USD)")
+abline(simple, col = "#c26c35", lwd = 2)
+invisible(dev.off())
+knitr::include_graphics("output/bill-tip.png")
+```
+
+**학생 작성:** [방향·산포·예외적 기록을 설명하고, 이 그림으로 알 수 없는 내용을 쓰세요.]
+
+# 통계분석
+
+## 5. 단순회귀와 인원수·요일을 고려한 모형
+
+```{r}
+#| label: regression-models
+# 5. 모형식은 이곳에서 수정합니다. Sun은 요일의 기준범주입니다.
+simple <- lm(tip ~ total_bill, data = d)
+model <- lm(tip ~ total_bill + size + day, data = d)
+show_table(coef_table(simple), "단순모형 계수와 95% 신뢰구간")
+coefficients <- export(coef_table(model), "coefficients")
+show_table(coefficients, "인원수·요일을 고려한 모형 계수")
+bill <- coefficients[coefficients$term == "total_bill", ]
+size_effect <- coefficients[coefficients$term == "size", ]
+```
+
+열 `estimate`는 계수, `se`는 보통 표준오차, `p`는 양측 p값,
+`low`와 `high`는 보통 표준오차에 따른 95% 신뢰구간입니다.
+
+**방법 선택:** [이 설명변수와 기준범주를 선택한 이유를 쓰세요. 단순모형과 다중모형이 답하는 질문을 구분하세요.]
+
+## 6. 설명변수 추가와 모형 비교
+
+```{r}
+#| label: model-comparison
+# 6. 변수 추가로 바뀌는 지표를 직접 비교합니다.
+expanded <- lm(tip ~ total_bill + size + day + sex + smoker + time, data = d)
+models <- list(simple, model, expanded)
+fit <- export(data.frame(
+  model = c("simple", "chapter-model", "expanded"),
+  r2 = sapply(models, function(m) summary(m)$r.squared),
+  adjusted_r2 = sapply(models, function(m) summary(m)$adj.r.squared)
+), "fit-comparison")
+show_table(fit, "표본 안의 모형 설명력 비교", 4)
+```
+
+**판단 질문:** 모형을 선택할 때 어떤 지표와 조건을 사용할까요? 새 자료의 예측 성능은 어떻게 확인해야 할까요?
+
+**학생 작성:** [선택할 모형, 근거와 남은 검증 과제를 쓰세요.]
+
+# 결과 해석
+
+[total_bill과 size 계수 2개를 단위와 조건을 포함해 해석하세요. daySat의 비교 기준도 쓰세요.]
+
+**점검 질문:** 계수의 단위와 비교 조건을 썼나요? p값·효과 크기·실무적 의미를 구분했나요?
+
+# 추가 진단
+
+## 7. 잔차와 다중공선성 점검
+
+```{r}
+#| label: fig-diagnostics
+#| fig-cap: "선택한 모형의 잔차·정규성·분산·영향력 진단"
+#| out-width: 100%
+# 7. 진단할 모형을 바꾸면 이 청크의 model도 확인합니다.
+png("output/diagnostics.png", width = 1200, height = 850, res = 120)
+par(mfrow = c(2, 2))
+plot(model)
+invisible(dev.off())
+knitr::include_graphics("output/diagnostics.png")
+X <- model.matrix(model)
+vifs <- sapply(2:ncol(X), function(j) {
+  1 / (1 - summary(lm(X[, j] ~ X[, -c(1, j), drop = FALSE]))$r.squared)
+})
+show_table(export(data.frame(term = colnames(X)[-1], vif = vifs), "dummy-vif"),
+           "설계행렬의 개별 더미열 VIF")
+```
+
+VIF 표는 설계행렬의 개별 더미열 지표입니다. 요일 전체의 일반화 VIF와 구분합니다.
+
+[잔차 그림에서 실제로 보이는 패턴과 HC3 비교를 연결하세요. 점검하지 않은 가정을 충족했다고 쓰지 않습니다.]
+
+# 강건성 검토
+
+## 8. HC3 표준오차 비교
+
+```{r}
+#| label: hc3-comparison
+# 8. 계수는 유지하고 표준오차와 구간의 민감도를 비교합니다.
+X <- model.matrix(model)
+bread <- solve(crossprod(X))
+weights <- residuals(model)^2 / (1 - hatvalues(model))^2
+hc3 <- bread %*% crossprod(X, X * weights) %*% bread
+se <- sqrt(diag(hc3))
+tcrit <- qt(.975, df.residual(model))
+hc3_results <- export(data.frame(
+  term = names(coef(model)), estimate = coef(model),
+  usual_se = coef(summary(model))[, 2], hc3_se = se,
+  hc3_low = coef(model) - tcrit * se, hc3_high = coef(model) + tcrit * se
+), "hc3")
+show_table(hc3_results, "보통 표준오차와 HC3 표준오차 비교")
+```
+
+HC3 구간은 잔차 자유도의 t 임계값을 사용하는 이 실습의 계산 방식입니다.
+
+[변수 추가와 HC3 표준오차 비교 중 무엇이 바뀌고 무엇이 유지되는지 쓰세요. 검증용 새 자료 없이 예측 성능 개선을 주장하지 않습니다.]
+
+**판단 질문:** 달라진 수치 때문에 자신의 해석이나 선택을 바꿔야 하나요? 이 계산으로 해결되지 않는 문제는 무엇인가요?
+
+# 결론
+
+### 무엇을 발견했는가?
+
+[핵심 수치와 조건을 근거로 2~3문장으로 쓰세요.]
+
+### 그래서 무엇을 해야 하는가?
+
+[사용할 분석 결과, 실행 조건과 확인할 지표를 쓰세요.]
+
+### 무엇을 아직 모르는가?
+
+[인과관계와 새 식당·기간에 대한 적용 가능성을 쓰세요.]
+
+**첫 페이지로 돌아가기:** 핵심 근거를 직접 선택하고 결론·권고·적용 조건·한계를 자신의 말로 작성하세요.
+
+# 재현성 체크리스트
+
+- [ ] 새 R 세션에서 QMD의 청크를 위에서 아래로 실행하고 HTML을 렌더링했다.
+- [ ] 원자료를 덮어쓰지 않았고 행 수·변수 단위를 확인했다.
+- [ ] 모형 선택 이유와 기준범주를 설명했다.
+- [ ] 계수·구간·p값과 실무적 의미를 구분했다.
+- [ ] 진단 결과와 HC3 비교를 근거로 판단을 작성했다.
+- [ ] 첫 페이지의 숫자가 본문의 실제 실행 결과와 일치한다.
+- [ ] AI를 사용했다면 제안과 직접 검증한 결과를 구분했다.
+
+## AI 사용 기록 {.unnumbered}
+
+[미사용 또는 질문·제안·직접 검증·수정사항을 씁니다.]
+
+# Appendix A. 평균과 다음 한 테이블의 범위 {.unnumbered}
+
+```{r}
+#| label: prediction-intervals
+# 9. 새로운 조건을 정하고 두 종류의 구간을 비교합니다.
+new <- data.frame(total_bill = 20, size = 2,
+                  day = factor("Sun", levels = levels(d$day)))
+mean_ci <- predict(model, new, interval = "confidence")
+individual_pi <- predict(model, new, interval = "prediction")
+intervals <- export(data.frame(
+  interval = c("mean-confidence", "individual-prediction"),
+  rbind(mean_ci, individual_pi)
+), "prediction-intervals")
+show_table(intervals, "20달러·2인·일요일의 팁 금액 구간 (USD)")
+```
+
+[두 구간의 폭을 계산하고 왜 다른지 설명하세요. 직원 보상과 예산 계획에 필요한 구간을 구분하고, 새 기간 자료로 검증할 계획을 쓰세요.]
+
+# Appendix B. 렌더링과 실행 환경 {.unnumbered}
+
+처음 한 번 `install.packages(c("knitr", "rmarkdown"))`로 패키지를 준비합니다.
+ZIP을 풀고 `report-template.qmd`를 RStudio 또는 VS Code에서 열어 번호별 청크를 실행합니다.
+코드와 해석을 수정한 뒤 아래 명령으로 제출용 HTML을 생성합니다.
+
+```bash
+quarto render report-template.qmd --to html
+quarto render report-template.qmd --to docx
+quarto render report-template.qmd --to pdf
+```
+
+이 QMD 안의 R 청크가 분석 코드의 본문입니다. 별도 `analysis.R` 실행은 필요하지 않습니다.
+데이터와 `styles.css`, `pagebreak.lua`, `reference.docx`는 같은 ZIP에 포함됩니다.
+PDF는 한국어 LaTeX 환경이 필요합니다. 공식 제출은 집현캠퍼스 안내를 따릅니다.
+
+```{r}
+#| label: session-info
+#| echo: false
+sessionInfo()
+```
