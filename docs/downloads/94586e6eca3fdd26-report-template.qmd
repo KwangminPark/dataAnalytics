@@ -1,14 +1,17 @@
 ---
 title: "6장 식사금액과 팁 분석 리포트"
-subtitle: "교수자 예시 해석 · 조건부 연관성과 예측의 한계"
+subtitle: "학생 작성용 · 조건부 연관성과 예측의 한계"
 author:
-  - name: "교수자 예시"
+  - name: "학번 이름"
     affiliation: "세종대학교"
 date: today
 lang: ko
 
 format:
   html:
+    include-in-header:
+      text: |
+        <style>main table{display:block;max-width:100%;overflow-x:auto}main,.cell{min-width:0}h1,h2,h3{overflow-wrap:anywhere}</style>
     format-links: false
     toc: true
     toc-depth: 3
@@ -84,97 +87,51 @@ coef_table <- function(m) {
 }
 ```
 
-```{r}
-#| label: reference-summary-setup
-#| include: false
-# 결과를 output 폴더에 저장합니다. 원본 data 파일은 바꾸지 않습니다.
-options(digits=7)
-dir.create("output",showWarnings=FALSE)
-read_data <- function(name) read.csv(file.path("data",name),fileEncoding="UTF-8-BOM",check.names=FALSE,stringsAsFactors=FALSE)
-export <- function(x,name) { print(x); write.csv(x,file.path("output",paste0(name,".csv")),row.names=FALSE) }
-coef_table <- function(m) { z <- coef(summary(m)); ci <- confint(m); data.frame(term=rownames(z),estimate=z[,1],se=z[,2],p=z[,4],low=ci[,1],high=ci[,2],row.names=NULL) }
-summary_by <- function(x,g) do.call(rbind,lapply(split(x,g),function(y) data.frame(n=length(y),mean=mean(y),median=median(y),sd=sd(y),IQR=IQR(y))))
-picture <- function(name,w=1100,h=720) png(file.path("output",paste0(name,".png")),width=w,height=h,res=120)
-# 1. 6.10: tips는 R 기본 내장자료가 아닌 reshape2 배포자료입니다.
-d <- read_data("tips.csv"); stopifnot(nrow(d)==244,!anyNA(d))
-d$day <- factor(d$day,levels=c("Sun","Thur","Fri","Sat"))
-print(summary(d)); print(table(d$day))
-simple <- lm(tip~total_bill,data=d)
-model <- lm(tip~total_bill+size+day,data=d)
-expanded <- lm(tip~total_bill+size+day+sex+smoker+time,data=d)
-export(coef_table(model),"coefficients")
-export(data.frame(model=c("simple","chapter-model","expanded"),r2=sapply(list(simple,model,expanded),function(m) summary(m)$r.squared),adjusted_r2=sapply(list(simple,model,expanded),function(m) summary(m)$adj.r.squared)),"fit-comparison")
-picture("bill-tip")
-plot(d$total_bill,d$tip,pch=16,col="#236b6660",xlab="Total bill (USD)",ylab="Tip (USD)")
-abline(simple,col="#c26c35",lwd=2); dev.off()
-# 2. 잔차 진단과 다중공선성. 범주형은 더미열별 R제곱으로 확인합니다.
-picture("diagnostics",1200,850); par(mfrow=c(2,2)); plot(model); dev.off()
-X <- model.matrix(model)
-vifs <- sapply(2:ncol(X),function(j) 1/(1-summary(lm(X[,j]~X[,-c(1,j),drop=FALSE]))$r.squared))
-export(data.frame(term=colnames(X)[-1],vif=vifs),"dummy-vif")
-# 3. 교재 장말 과제: 이분산에 민감한 표준오차를 HC3와 비교
-bread <- solve(crossprod(X)); weights <- residuals(model)^2/(1-hatvalues(model))^2
-hc3 <- bread %*% crossprod(X,X*weights) %*% bread
-se <- sqrt(diag(hc3)); tcrit <- qt(.975,df.residual(model))
-export(data.frame(term=names(coef(model)),estimate=coef(model),usual_se=coef(summary(model))[,2],hc3_se=se,hc3_low=coef(model)-tcrit*se,hc3_high=coef(model)+tcrit*se),"hc3")
-# 4. 심화: 평균의 신뢰구간과 한 테이블의 예측구간은 다릅니다.
-new <- data.frame(total_bill=20,size=2,day=factor("Sun",levels=levels(d$day)))
-export(data.frame(interval=c("mean-confidence","individual-prediction"),rbind(predict(model,new,interval="confidence"),predict(model,new,interval="prediction"))),"prediction-intervals")
-cat("Intervals above use the ordinary lm assumptions; inspect heteroskedasticity before relying on their width.
-")
 
-coefficients <- coef_table(model)
-bill <- coefficients[coefficients$term == "total_bill", ]
-size_effect <- coefficients[coefficients$term == "size", ]
-mean_ci <- predict(model, new, interval = "confidence")
-individual_pi <- predict(model, new, interval = "prediction")
-```
 
 ::: {.hero}
 # Executive One-Page Proposal {.unnumbered}
 
-**교수자 예시 해석** · 아래 번호별 R 청크를 실행하고 자신의 판단을 작성합니다.
+**학생 작성용** · 아래 번호별 R 청크를 실행하고 자신의 판단을 작성합니다.
 QMD의 코드를 수정하면 다음 렌더링에 반영됩니다. 첫 페이지는 본문 분석을 마친 뒤 작성합니다.
 :::
 
 ::: {.result-box}
 ## 1. Bottom Line {.unnumbered}
 
-인원수와 요일이 같은 기록을 비교하면 식사금액 1달러 차이는 평균 팁 약 **`r fmt(bill$estimate)`달러** 차이와 연결됩니다. 이 계수는 관찰자료의 조건부 연관성입니다.
+[식사금액 계수의 방향·크기·단위와 조건을 포함해 한 문장으로 쓰세요. 인과효과라고 단정하지 않습니다.]
 :::
 
 ## 2. Decision / Recommendation {.unnumbered}
 
-1. 식사금액·인원수·요일을 함께 고려한 평균 팁을 계획의 참고값으로 사용합니다.
-2. 개인 직원 평가나 보상 기준으로 바로 적용하지 않습니다.
-3. 새 기간의 실제 기록으로 예측 오차와 적용 범위를 점검한 뒤 운영에 사용합니다.
+1. [분석 결과를 사용할 의사결정을 쓰세요.]
+2. [실행 전 추가로 확인할 자료나 조건을 쓰세요.]
+3. [실행을 보류하거나 중단할 조건을 쓰세요.]
 
 ## 3. Key Evidence {.unnumbered}
 
-```{r}
-#| label: reference-key-evidence
-#| echo: false
-show_table(data.frame(근거 = c("기록 수", "식사금액 계수", "R²"), 값 = c(nrow(d), bill$estimate, summary(model)$r.squared)), "교수자 예시 핵심 근거")
-```
+| 직접 선택한 핵심 근거 | 실행 결과 | 단위·비교 조건 |
+| --- | --- | --- |
+| [근거 1] | [값] | [조건] |
+| [근거 2] | [값] | [조건] |
+| [근거 3] | [값] | [조건] |
+
+[아래 분석 결과 중 자신의 판단을 뒷받침하는 근거 3~5개를 선택하세요.]
 
 ## 4. Managerial / Practical Implication {.unnumbered}
 
-같은 인원수·요일 조건에서도 식사금액과 팁 금액의 연관성이 남습니다. 그러나 이 자료로 식사금액을 올리면 팁이 얼마나 늘어나는지, 서비스 품질이 무엇인지 판단할 수 없습니다. 운영 계획에는 평균의 불확실성과 개별 테이블의 불확실성을 구분해 사용합니다.
+[같은 인원수와 요일이라는 조건을 설명하고, 이 결과를 활용할 대상과 적용 범위를 쓰세요.]
 
 ## 5. Risk / Limitation {.unnumbered}
 
-관찰자료이므로 누락변수와 표본의 적용 범위에 한계가 있습니다. 아래 예측구간은 보통 lm 가정에 따른 구간이며 HC3 표준오차를 사용했다고 자동으로 교정되지 않습니다.
+[관찰자료의 인과해석 한계와 단일 테이블 예측의 불확실성을 각각 한 문장으로 쓰세요.]
 
 ::: {.pagebreak}
 :::
 
 # 연구문제
 
-이 실습은 식사금액과 팁 금액의 관계가 인원수와 요일을 고려한 뒤에도 남는지 확인합니다. 평균 팁의 범위와 다음 한 테이블의 범위를 구분하여 운영 계획에 사용할 근거와 한계를 제시합니다.
-
-- RQ1. 식사금액은 팁 금액과 어떤 관계를 가지는가?
-- RQ2. 인원수와 요일을 고려하면 계수와 모형 설명력은 어떻게 달라지는가?
-- RQ3. 표준오차와 예측의 불확실성을 고려하면 어떤 판단을 보류해야 하는가?
+[평가할 의사결정과 연구질문을 자신의 말로 쓰세요. 종속변수가 팁 금액인지 팁 비율인지 명확히 구분하세요.]
 
 **작성 질문:** 누구의 어떤 의사결정을 돕는 분석인가요? 종속변수는 팁 금액과 팁 비율 중 무엇인가요?
 
@@ -234,7 +191,7 @@ by_day <- do.call(rbind, lapply(levels(d$day), function(day) {
 show_table(by_day, "요일별 기록 수와 평균 (금액: USD)")
 ```
 
-한 행은 식사 계산서 기록이며 분석 대상은 **`r nrow(d)`건**입니다. 요일별 표본 수가 같지 않으므로 요일 평균을 비교할 때 구성의 차이를 함께 봅니다. 팁 금액과 팁 비율은 다른 변수이며 이 보고서의 종속변수는 팁 금액입니다.
+[식사금액과 팁의 평균·표준편차·범위, 요일별 표본 수를 근거로 비교 대상을 설명하세요.]
 
 **판단 질문:** 어떤 비교가 필요하나요? 평균 차이의 원인을 이 표만으로 설명할 수 있나요?
 
@@ -300,7 +257,7 @@ show_table(fit, "표본 안의 모형 설명력 비교", 4)
 
 # 결과 해석
 
-total_bill 계수는 **`r fmt(bill$estimate)`**입니다. 인원수와 요일이 같다고 놓았을 때 식사금액 1달러 차이는 평균 팁 약 `r fmt(bill$estimate)`달러 차이와 연결됩니다. size 계수는 **`r fmt(size_effect$estimate)`**로, 같은 금액·요일에서 인원수 1명 차이에 해당하는 조건부 연관성입니다. daySat은 같은 금액·인원 조건의 **일요일(Sun)**과 비교한 토요일 차이입니다. 절편의 total_bill=0 조건은 이 자료에서 현실적인 식사 상황으로 해석하기 어렵습니다.
+[total_bill과 size 계수 2개를 단위와 조건을 포함해 해석하세요. daySat의 비교 기준도 쓰세요.]
 
 **점검 질문:** 계수의 단위와 비교 조건을 썼나요? p값·효과 크기·실무적 의미를 구분했나요?
 
@@ -328,7 +285,7 @@ show_table(export(data.frame(term = colnames(X)[-1], vif = vifs), "dummy-vif"),
 
 VIF 표는 설계행렬의 개별 더미열 지표입니다. 요일 전체의 일반화 VIF와 구분합니다.
 
-잔차 그림에서 예측값과 함께 잔차의 흩어짐이 변하는지, 큰 잔차와 영향력이 높은 기록이 있는지 점검합니다. 한 그림만으로 모든 가정이 충족된다고 결론 내리지 않습니다. HC3 비교는 이분산에 대한 표준오차의 민감도를 보여주며 비선형성·누락변수·인과 문제를 해결하지 않습니다.
+[잔차 그림에서 실제로 보이는 패턴과 HC3 비교를 연결하세요. 점검하지 않은 가정을 충족했다고 쓰지 않습니다.]
 
 # 강건성 검토
 
@@ -353,7 +310,7 @@ show_table(hc3_results, "보통 표준오차와 HC3 표준오차 비교")
 
 HC3 구간은 잔차 자유도의 t 임계값을 사용하는 이 실습의 계산 방식입니다.
 
-추가 변수를 넣으면 R²는 `r fmt(summary(model)$r.squared, 4)`에서 `r fmt(summary(expanded)$r.squared, 4)`로 바뀌지만 수정 R²는 `r fmt(summary(model)$adj.r.squared, 4)`에서 `r fmt(summary(expanded)$adj.r.squared, 4)`로 바뀝니다. 설명변수 추가가 새 고객 예측 성능의 개선을 입증하지는 않습니다. HC3 비교에서는 같은 회귀계수를 유지하고 추론에 사용하는 표준오차와 구간을 바꿉니다.
+[변수 추가와 HC3 표준오차 비교 중 무엇이 바뀌고 무엇이 유지되는지 쓰세요. 검증용 새 자료 없이 예측 성능 개선을 주장하지 않습니다.]
 
 **판단 질문:** 달라진 수치 때문에 자신의 해석이나 선택을 바꿔야 하나요? 이 계산으로 해결되지 않는 문제는 무엇인가요?
 
@@ -361,15 +318,15 @@ HC3 구간은 잔차 자유도의 t 임계값을 사용하는 이 실습의 계�
 
 ### 무엇을 발견했는가?
 
-식사금액·인원수·요일을 고려한 모형의 R²는 `r fmt(summary(model)$r.squared, 4)`이고 수정 R²는 `r fmt(summary(model)$adj.r.squared, 4)`입니다. 식사금액 계수는 약 `r fmt(bill$estimate)`달러/달러이며 표본 안의 조건부 연관성입니다.
+[핵심 수치와 조건을 근거로 2~3문장으로 쓰세요.]
 
 ### 그래서 무엇을 해야 하는가?
 
-평균 수준의 계획에는 모형을 참고하되 새 기간의 실제 자료로 오차를 확인합니다. 개별 테이블이나 직원의 결과를 평균 추정값으로 확정하지 않습니다.
+[사용할 분석 결과, 실행 조건과 확인할 지표를 쓰세요.]
 
 ### 무엇을 아직 모르는가?
 
-식사금액을 조정했을 때의 인과효과, 다른 식당이나 국가에서의 적용 가능성, 새 자료에서의 예측 성능은 이 분석만으로 알 수 없습니다.
+[인과관계와 새 식당·기간에 대한 적용 가능성을 쓰세요.]
 
 **첫 페이지로 돌아가기:** 핵심 근거를 직접 선택하고 결론·권고·적용 조건·한계를 자신의 말로 작성하세요.
 
@@ -403,7 +360,7 @@ intervals <- export(data.frame(
 show_table(intervals, "20달러·2인·일요일의 팁 금액 구간 (USD)")
 ```
 
-평균 팁의 95% 신뢰구간 폭은 **`r fmt(diff(mean_ci[1, c("lwr", "upr")]))`달러**, 한 테이블의 95% 예측구간 폭은 **`r fmt(diff(individual_pi[1, c("lwr", "upr")]))`달러**입니다. 후자는 평균 추정의 불확실성에 개별 관측의 변동도 더하므로 넓습니다. 두 구간은 보통 lm 가정에 따른 것으로 이분산을 자동 교정하지 않습니다. 예산은 여러 테이블의 합계에 대한 추가 모델링이 필요하며, 개별 직원 보상을 이 자료의 테이블 예측구간으로 정할 근거도 없습니다.
+[두 구간의 폭을 계산하고 왜 다른지 설명하세요. 직원 보상과 예산 계획에 필요한 구간을 구분하고, 새 기간 자료로 검증할 계획을 쓰세요.]
 
 # Appendix B. 렌더링과 실행 환경 {.unnumbered}
 

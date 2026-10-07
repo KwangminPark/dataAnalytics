@@ -1,0 +1,281 @@
+---
+title: "1장 · 감으로 정한 인력 배치, 어떤 질문부터 할까? 분석 리포트"
+subtitle: "교수자 검산용 · 해석 예시"
+author:
+  - name: "교수자 예시"
+    affiliation: "세종대학교"
+date: today
+lang: ko
+
+format:
+  html:
+    include-in-header:
+      text: |
+        <style>main table{display:block;max-width:100%;overflow-x:auto}main,.cell{min-width:0}h1,h2,h3{overflow-wrap:anywhere}</style>
+    format-links: false
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    smooth-scroll: true
+    code-fold: true
+    code-tools: true
+    code-copy: true
+    theme:
+      light: cosmo
+      dark: darkly
+    css: styles.css
+    embed-resources: true
+
+  pdf:
+    documentclass: scrartcl
+    toc: true
+    number-sections: true
+    keep-tex: false
+    colorlinks: true
+    geometry:
+      - top=22mm
+      - bottom=22mm
+      - left=24mm
+      - right=24mm
+    include-in-header:
+      text: |
+        \usepackage{kotex}
+        \usepackage{booktabs}
+        \usepackage{longtable}
+        \usepackage{float}
+        \usepackage{xcolor}
+        \definecolor{Accent}{HTML}{17365D}
+        \setkomafont{section}{\color{Accent}\Large\bfseries}
+        \setkomafont{subsection}{\color{Accent}\large\bfseries}
+
+  docx:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    reference-doc: reference.docx
+
+execute:
+  echo: true
+  warning: true
+  message: false
+  freeze: false
+  cache: false
+  error: false
+
+filters:
+  - pagebreak.lua
+---
+
+
+```{r}
+#| label: setup
+#| include: false
+# 결과를 output 폴더에 저장합니다. 원본 data 파일은 바꾸지 않습니다.
+options(digits=7)
+dir.create("output",showWarnings=FALSE)
+read_data <- function(name) read.csv(file.path("data",name),fileEncoding="UTF-8-BOM",check.names=FALSE,stringsAsFactors=FALSE)
+export <- function(x,name) { print(x); write.csv(x,file.path("output",paste0(name,".csv")),row.names=FALSE) }
+coef_table <- function(m) { z <- coef(summary(m)); ci <- confint(m); data.frame(term=rownames(z),estimate=z[,1],se=z[,2],p=z[,4],low=ci[,1],high=ci[,2],row.names=NULL) }
+summary_by <- function(x,g) do.call(rbind,lapply(split(x,g),function(y) data.frame(n=length(y),mean=mean(y),median=median(y),sd=sd(y),IQR=IQR(y))))
+picture <- function(name,w=1100,h=720) png(file.path("output",paste0(name,".png")),width=w,height=h,res=120)
+```
+
+::: {.hero}
+# Executive One-Page Proposal {.unnumbered}
+
+번호별 R 청크를 읽고 실행합니다. 분석을 마친 뒤 핵심 근거를 선택해 첫 페이지를 작성하세요.
+:::
+
+::: {.result-box}
+## 1. Bottom Line {.unnumbered}
+
+[실제 수치·단위·비교 조건을 포함한 핵심 결론 한 문장]
+:::
+
+## 2. Decision / Recommendation {.unnumbered}
+
+1. [실행하거나 보류할 일]
+2. [실행 조건과 추가로 확인할 자료]
+3. [결과를 점검할 지표와 중단 조건]
+
+## 3. Key Evidence {.unnumbered}
+
+| 직접 선택한 핵심 근거 | 실행 결과 | 단위·비교 조건 |
+| --- | --- | --- |
+| [근거 1] | [값] | [조건] |
+| [근거 2] | [값] | [조건] |
+| [근거 3] | [값] | [조건] |
+
+[아래 분석 결과 중 자신의 판단을 뒷받침하는 근거 3~5개를 선택하세요.]
+
+## 4. Managerial / Practical Implication {.unnumbered}
+
+[누구에게 어떤 의미가 있는지, 적용 대상과 범위를 쓰세요.]
+
+## 5. Risk / Limitation {.unnumbered}
+
+[자료·방법·적용 범위의 한계와 말할 수 없는 주장을 쓰세요.]
+
+::: {.pagebreak}
+:::
+
+# 연구문제
+
+토요일에 손님이 더 많다는 이유로 직원을 늘려도 될까요? 매장 책임자는 인력 배치를 정해야 하지만, 분석가는 아직 비용과 대기시간 자료를 받지 못했습니다. 이때 할 일은 어려운 분석을 고르는 것이 아니라 판단에 필요한 질문을 만드는 일입니다.
+
+**학생 작성:** [연구질문, 실행 전 예상, 판단할 의사결정을 자신의 말로 구체화하세요.]
+
+교재 연결: [오리엔테이션](https://kwangminpark.github.io/businessAnalytics/Chapter1.html) · 1.1~1.3 분석가의 역할, 1.4 실습 환경과 Quarto
+
+# 데이터와 분석 범위
+
+decision-example.csv는 교재 1.1의 인력 배치 상황을 연습하기 위해 새로 구성한 2행의 설명용 장부입니다. 실제 관측자료도, 교재에 있던 원본 표도 아닙니다. 한 행은 한 요일의 하루를 뜻합니다. Friday/Saturday는 금요일/토요일, visitors는 방문객 수(명), buyers는 구매고객 수(명), sales는 매출(원), labor_hours는 투입 근로시간(시간)입니다. 이 두 날로 다음 달의 수요를 추론하지 않습니다. 비용, 이익, 기다린 시간, 서비스를 포기한 사람 수는 없습니다.
+
+**학생 작성:** [한 행의 의미, 변수 단위, 표본 범위와 추가 점검 사항을 쓰세요.]
+
+자료 이력은 source-provenance.txt, 열 정보는 DATA-DICTIONARY.csv에서 확인합니다.
+
+# 번호별 분석 코드 · 읽고 실행하기
+
+코드와 선택 조건을 QMD 안에서 수정합니다. 계산은 output에 저장되며 원자료는 덮어쓰지 않습니다. 검산용 reference-output은 실행 입력으로 사용하지 않습니다.
+
+## 1. 먼저 질문: 사람이 더 필요한 날을 방문객 수만으로 고를 수 있을까?
+
+```{r}
+#| label: analysis-1
+# 1. 먼저 질문: 사람이 더 필요한 날을 방문객 수만으로 고를 수 있을까?
+d <- read_data("decision-example.csv")
+stopifnot(nrow(d)==2,all(d$buyers<=d$visitors))
+print(d)
+```
+
+```{r}
+#| label: tables-1
+#| echo: false
+#| results: asis
+
+```
+
+**판단 질문:** 방문객 수·구매자 수·매출 중 인력 배치에 필요한 지표는 무엇인가요?
+
+**학생 작성:** [실행에서 선택한 근거와 단위·조건을 연결해 해석하고, 판단이 바뀌었는지와 남은 불확실성을 쓰세요.]
+
+## 2. 분자와 분모를 읽으며 계산하기. 이익은 비용자료가 없어 계산할 수 없습니다.
+
+```{r}
+#| label: analysis-2
+# 2. 분자와 분모를 읽으며 계산하기. 이익은 비용자료가 없어 계산할 수 없습니다.
+d$buy_rate <- d$buyers/d$visitors
+d$sales_per_buyer <- d$sales/d$buyers
+d$sales_per_labor_hour <- d$sales/d$labor_hours
+export(d,"decision-table")
+```
+
+```{r}
+#| label: tables-2
+#| echo: false
+#| results: asis
+cat("\n\n"); print(knitr::kable(read.csv("output/decision-table.csv", check.names=FALSE), digits=4, caption="decision-table.csv", row.names=FALSE)); cat("\n\n")
+```
+
+**판단 질문:** 전환율·객단가·시간당 매출의 분모와 단위를 설명하세요. 비용 없이 이익을 판단할 수 있나요?
+
+**학생 작성:** [실행에서 선택한 근거와 단위·조건을 연결해 해석하고, 판단이 바뀌었는지와 남은 불확실성을 쓰세요.]
+
+## 3. 설치 확인: 표와 그림을 파일로 만들 수 있나요?
+
+```{r}
+#| label: analysis-3
+# 3. 설치 확인: 표와 그림을 파일로 만들 수 있나요?
+picture("first-chart")
+barplot(d$sales,names.arg=d$day,ylab="Sales (KRW)",col=c("#236b66","#db934b"),main="Two illustrative days: not a staffing experiment")
+dev.off()
+cat("Friday/Saturday are a constructed teaching example. Labor hours are not labor cost.
+")
+```
+
+```{r}
+#| label: tables-3
+#| echo: false
+#| results: asis
+
+```
+
+```{r}
+#| label: figures-3
+#| echo: false
+#| out-width: 100%
+knitr::include_graphics(c("output/first-chart.png"))
+```
+
+**판단 질문:** 표와 그림에서 선택한 근거를 적고 추가로 수집할 자료와 실행 조건을 쓰세요.
+
+**학생 작성:** [실행에서 선택한 근거와 단위·조건을 연결해 해석하고, 판단이 바뀌었는지와 남은 불확실성을 쓰세요.]
+
+# 교수자 해석 예시
+
+기준 계산에서 구매 비율은 금요일 90%, 토요일 70%입니다. 구매고객당 매출은 각각 15,000원과 14,000원이고, 근로시간당 매출은 45,000원과 약 32,667원입니다. 그러나 이익이나 적정 직원 수를 구한 것은 아닙니다. 시간당 매출이 낮은 이유가 직원 과다인지, 고객 대기·구매 포기인지 아직 알 수 없습니다. “추가 관측 후 배치를 결정하겠다”도 근거가 있는 경영 판단입니다.
+
+예시도 자료와 방법의 조건 안에서 평가하세요. 첫 페이지는 이 결과 중 어떤 근거를 선택하는지에 따라 달라지므로 작성 틀을 유지합니다.
+
+# 결과 해석
+
+[핵심 결과 두 가지를 수치·단위·조건과 함께 설명하세요. 통계적 근거와 실무적 의미, 자료에서 말할 수 없는 주장을 구분하세요.]
+
+# 진단과 강건성
+
+[코드에서 실제로 확인한 진단 또는 민감도 비교를 적고, 확인하지 않은 가정과 추가 검증 방법을 쓰세요. 결과 때문에 선택을 바꿀지 판단하세요.]
+
+# 결론
+
+## 무엇을 발견했는가?
+
+[실행 결과를 근거로 2~3문장]
+
+## 그래서 무엇을 해야 하는가?
+
+[실행 또는 보류 판단, 적용 조건과 확인할 지표]
+
+## 무엇을 아직 모르는가?
+
+[추가 자료와 검증 과제]
+
+첫 페이지로 돌아가 핵심 근거와 권고를 직접 작성하세요.
+
+# 재현성 체크리스트
+
+- [ ] 새 세션에서 번호별 청크를 순서대로 실행했다.
+- [ ] 원자료·행 수·단위·표본 범위를 확인했다.
+- [ ] 방법과 비교 조건의 선택 이유를 썼다.
+- [ ] 해석과 첫 페이지의 숫자가 실제 출력과 일치한다.
+- [ ] 진단·민감도와 적용 한계를 설명했다.
+- [ ] AI의 제안과 직접 검증한 결과를 구분했다.
+
+## AI 사용 기록
+
+[미사용 또는 질문·제안·직접 검증·수정 사항]
+
+# Appendix A. 마지막 심화 실습 {.unnumbered}
+
+심화 — 같은 매출을 다른 질문으로 읽기
+방문객당 매출(sales/visitors)을 추가합니다. 구매고객당 매출과 왜 다를까요? 구매 비율이 바뀌면 매출에 어떤 경로로 연결되는지 말로 설명하세요. 이어 “추가 근무 2시간”을 검토하려면 필요한 비용·서비스 자료와 비교 방법을 설계합니다. 효과를 가정해 확정하지 말고, 실행 전 확인할 조건과 실행 후 중단할 조건을 각각 하나씩 적습니다.
+
+[추가 계산, 판단의 변화와 한계를 작성하세요.]
+
+# Appendix B. 실행 환경 {.unnumbered}
+
+처음 한 번 `install.packages(c("knitr", "rmarkdown"))`로 패키지를 준비합니다. ZIP을 풀고 QMD·data·styles.css·pagebreak.lua·reference.docx를 같은 폴더에 둡니다. 별도 analysis.R 없이 실행합니다. 캐시와 freeze는 사용하지 않습니다.
+
+```bash
+quarto render report-template.qmd --to html
+quarto render report-template.qmd --to docx
+quarto render report-template.qmd --to pdf
+```
+
+PDF에는 한국어 LaTeX 환경이 필요합니다. 공식 제출은 집현캠퍼스 안내를 따릅니다.
+
+```{r}
+#| label: session-info
+#| echo: false
+sessionInfo()
+```

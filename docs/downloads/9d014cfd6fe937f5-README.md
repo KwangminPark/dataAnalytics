@@ -22,7 +22,15 @@ A매장 만족도는 기준 4.0과 다른가요? A와 B는 서로 다른가요? 
 
 ## 준비와 실행
 
-ZIP을 새 폴더에 풉니다. analysis.R와 data 폴더를 같은 위치에 두고, RStudio 프로젝트 또는 VS Code의 작업 폴더를 이 위치로 엽니다. 먼저 질문에 대한 예상을 쓰고 analysis.R의 번호별 구간을 차례로 실행하세요. 전체 재실행은 `Rscript --vanilla analysis.R`입니다. 원본 data를 덮어쓰지 않습니다. 결과는 output 폴더에 생성됩니다.
+전체 ZIP을 새 폴더에 풀고 report-template.qmd를 엽니다. 문서 안의 번호별 R 청크를 순서대로 실행합니다. 분석 코드와 판단·해석 작성란은 QMD에서 수정합니다. `quarto render report-template.qmd --to html`로 보고서를 생성합니다. 원본 data를 덮어쓰지 않고 계산 결과는 output에 저장됩니다.
+
+## Quarto 학생 분석 보고서
+
+학생용 report-template.qmd와 교수자 예시 reference-report.qmd는 제공된 Quarto 학생 리포트 템플릿을 기반으로 합니다. 첫 페이지는 결론·권고·핵심 근거·실무적 의미·한계, 본문은 질문→자료→번호별 분석→해석→진단·민감도→결론 순서입니다. 학생용에는 해석 작성란, 교수자용에는 실행값을 반영한 예시 해석이 있습니다.
+
+처음 한 번 install.packages(c("knitr", "rmarkdown"))로 패키지를 준비합니다. ZIP을 풀고 같은 폴더에서 `quarto render report-template.qmd --to html`을 실행하면 QMD 안의 번호별 R 청크를 실행해 표·그림을 생성합니다. 분석 코드와 학생 작성란은 QMD에서 수정합니다. 핵심 근거 선택·모형 선택·판단·해석은 학생이 작성하며 첫 페이지도 분석을 마친 뒤 직접 채웁니다. 별도 analysis.R 없이 실행할 수 있습니다. 캐시와 freeze를 사용하지 않습니다. 기본 R 중심의 분석으로 tidyverse와 broom은 필요하지 않습니다.
+
+Word: `quarto render report-template.qmd --to docx`. PDF: `quarto render report-template.qmd --to pdf` (한국어 LaTeX 필요). styles.css·pagebreak.lua·reference.docx는 원본 템플릿 그대로 ZIP에 포함되어 있습니다. QMD 파일만 다운로드하면 이 보조파일과 데이터가 빠지므로 전체 ZIP을 사용하세요.
 
 reference-output은 검산용입니다. 먼저 자신의 output을 만들고 숫자와 표본 수를 대조하세요. 그림의 글꼴·픽셀은 운영체제에 따라 달라질 수 있습니다.
 
@@ -44,7 +52,7 @@ paired=TRUE로 after−before를 분석합니다. 원문은 before−after이므
 
 ## 멈추고 해석하기
 
-원본 실행에서 A−4는 약 0.119점(95% 구간 0.070~0.168), A−B는 약 0.334점(0.258~0.409), 교육 후−전은 약 0.407점(0.374~0.441)입니다. 작게 표시되는 p값이 0인 것은 아닙니다. “통계적으로 차이가 있다” 다음에는 그 차이가 비용을 들여 대응할 만큼 큰지 별도 기준이 필요합니다. 95% 신뢰구간은 같은 절차를 반복할 때 구간이 모평균 차이를 포함하는 장기 비율을 뜻합니다.
+방법 선택 이유, 결과의 조건·단위, 진단에 따른 판단 변경, 결론의 적용 범위와 한계를 자신의 말로 쓰세요.
 
 ## AI와 함께 확인하기
 

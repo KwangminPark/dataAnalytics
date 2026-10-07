@@ -1,0 +1,294 @@
+---
+title: "2장 · 숫자로 저장됐다고 모두 수량일까? 분석 리포트"
+subtitle: "학생 작성용"
+author:
+  - name: "학번 이름"
+    affiliation: "세종대학교"
+date: today
+lang: ko
+
+format:
+  html:
+    include-in-header:
+      text: |
+        <style>main table{display:block;max-width:100%;overflow-x:auto}main,.cell{min-width:0}h1,h2,h3{overflow-wrap:anywhere}</style>
+    format-links: false
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    smooth-scroll: true
+    code-fold: true
+    code-tools: true
+    code-copy: true
+    theme:
+      light: cosmo
+      dark: darkly
+    css: styles.css
+    embed-resources: true
+
+  pdf:
+    documentclass: scrartcl
+    toc: true
+    number-sections: true
+    keep-tex: false
+    colorlinks: true
+    geometry:
+      - top=22mm
+      - bottom=22mm
+      - left=24mm
+      - right=24mm
+    include-in-header:
+      text: |
+        \usepackage{kotex}
+        \usepackage{booktabs}
+        \usepackage{longtable}
+        \usepackage{float}
+        \usepackage{xcolor}
+        \definecolor{Accent}{HTML}{17365D}
+        \setkomafont{section}{\color{Accent}\Large\bfseries}
+        \setkomafont{subsection}{\color{Accent}\large\bfseries}
+
+  docx:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    reference-doc: reference.docx
+
+execute:
+  echo: true
+  warning: true
+  message: false
+  freeze: false
+  cache: false
+  error: false
+
+filters:
+  - pagebreak.lua
+---
+
+
+```{r}
+#| label: setup
+#| include: false
+# 결과를 output 폴더에 저장합니다. 원본 data 파일은 바꾸지 않습니다.
+options(digits=7)
+dir.create("output",showWarnings=FALSE)
+read_data <- function(name) read.csv(file.path("data",name),fileEncoding="UTF-8-BOM",check.names=FALSE,stringsAsFactors=FALSE)
+export <- function(x,name) { print(x); write.csv(x,file.path("output",paste0(name,".csv")),row.names=FALSE) }
+coef_table <- function(m) { z <- coef(summary(m)); ci <- confint(m); data.frame(term=rownames(z),estimate=z[,1],se=z[,2],p=z[,4],low=ci[,1],high=ci[,2],row.names=NULL) }
+summary_by <- function(x,g) do.call(rbind,lapply(split(x,g),function(y) data.frame(n=length(y),mean=mean(y),median=median(y),sd=sd(y),IQR=IQR(y))))
+picture <- function(name,w=1100,h=720) png(file.path("output",paste0(name,".png")),width=w,height=h,res=120)
+```
+
+::: {.hero}
+# Executive One-Page Proposal {.unnumbered}
+
+번호별 R 청크를 읽고 실행합니다. 분석을 마친 뒤 핵심 근거를 선택해 첫 페이지를 작성하세요.
+:::
+
+::: {.result-box}
+## 1. Bottom Line {.unnumbered}
+
+[실제 수치·단위·비교 조건을 포함한 핵심 결론 한 문장]
+:::
+
+## 2. Decision / Recommendation {.unnumbered}
+
+1. [실행하거나 보류할 일]
+2. [실행 조건과 추가로 확인할 자료]
+3. [결과를 점검할 지표와 중단 조건]
+
+## 3. Key Evidence {.unnumbered}
+
+| 직접 선택한 핵심 근거 | 실행 결과 | 단위·비교 조건 |
+| --- | --- | --- |
+| [근거 1] | [값] | [조건] |
+| [근거 2] | [값] | [조건] |
+| [근거 3] | [값] | [조건] |
+
+[아래 분석 결과 중 자신의 판단을 뒷받침하는 근거 3~5개를 선택하세요.]
+
+## 4. Managerial / Practical Implication {.unnumbered}
+
+[누구에게 어떤 의미가 있는지, 적용 대상과 범위를 쓰세요.]
+
+## 5. Risk / Limitation {.unnumbered}
+
+[자료·방법·적용 범위의 한계와 말할 수 없는 주장을 쓰세요.]
+
+::: {.pagebreak}
+:::
+
+# 연구문제
+
+AI에게 “이 자료를 분석해줘”라고 하면 숫자 열마다 평균을 낼 수 있습니다. 매장 ID나 변속기 코드의 평균도 경영적으로 의미가 있을까요? 이번에는 분석 방법을 고르기 전에 변수의 의미, 관측 단위, 표본 범위를 사람이 먼저 정합니다.
+
+**학생 작성:** [연구질문, 실행 전 예상, 판단할 의사결정을 자신의 말로 구체화하세요.]
+
+교재 연결: [통계학의 본질과 변수의 이해](https://kwangminpark.github.io/businessAnalytics/Chapter2.html) · 2.1~2.7 통계적 판단과 변수, 2.8.3~2.8.8 장말 실습 전체
+
+# 데이터와 분석 범위
+
+첫 자료 mtcars.csv는 R datasets::mtcars를 내보낸 32개 자동차 자료입니다. car는 차종 이름, mpg는 연비(miles/gallon), cyl은 실린더 수, hp는 마력, am은 변속기 코드(0 자동, 1 수동), gear는 기어 수입니다. cyl과 gear는 수량으로도 정의할 수 있지만 이번 집단 비교에서는 범주로 사용합니다. factor로 바꾸는 이유는 “숫자이므로 틀려서”가 아니라 현재의 분석 질문 때문입니다. 두 번째 ch2_data.csv는 교수 제공 원본 500행의 가상 외식자료입니다. store_id는 식별자, location은 지역, avg_spend는 1인 평균 지출(원), visit_time은 평균 체류시간(분), membership은 일반/VIP, satisfaction은 1~5 만족도입니다. 파일의 행이 어떤 방식으로 추출된 매장/고객을 대표하는지는 생성 설명만으로 확정할 수 없습니다.
+
+**학생 작성:** [한 행의 의미, 변수 단위, 표본 범위와 추가 점검 사항을 쓰세요.]
+
+자료 이력은 source-provenance.txt, 열 정보는 DATA-DICTIONARY.csv에서 확인합니다.
+
+# 번호별 분석 코드 · 읽고 실행하기
+
+코드와 선택 조건을 QMD 안에서 수정합니다. 계산은 output에 저장되며 원자료는 덮어쓰지 않습니다. 검산용 reference-output은 실행 입력으로 사용하지 않습니다.
+
+## 1. 2.8.3~2.8.5: 숫자로 저장된 코드와 실제 수량 구분하기
+
+```{r}
+#| label: analysis-1
+# 1. 2.8.3~2.8.5: 숫자로 저장된 코드와 실제 수량 구분하기
+cars <- read_data("mtcars.csv")
+stopifnot(nrow(cars)==32)
+str(cars)
+print(table(cars$am))
+cars$am <- factor(cars$am,levels=c(0,1),labels=c("automatic","manual"))
+cars$cyl_group <- factor(cars$cyl)
+export(data.frame(type=names(table(cars$am)),n=as.vector(table(cars$am)),proportion=as.vector(prop.table(table(cars$am)))),"transmission")
+z <- summary_by(cars$mpg,cars$cyl_group)
+export(data.frame(cyl=rownames(z),z,row.names=NULL),"mpg-by-cyl")
+# 교재의 p값 읽기 활동입니다. ANOVA의 원리와 사후검정은 4장에서 배웁니다.
+print(summary(aov(mpg~cyl_group,data=cars)))
+```
+
+```{r}
+#| label: tables-1
+#| echo: false
+#| results: asis
+cat("\n\n"); print(knitr::kable(read.csv("output/mpg-by-cyl.csv", check.names=FALSE), digits=4, caption="mpg-by-cyl.csv", row.names=FALSE)); cat("\n\n")
+cat("\n\n"); print(knitr::kable(read.csv("output/transmission.csv", check.names=FALSE), digits=4, caption="transmission.csv", row.names=FALSE)); cat("\n\n")
+```
+
+**판단 질문:** 숫자 코드와 수량 변수를 구분하고 집단별 표본 수를 고려한 비교를 선택하세요.
+
+**학생 작성:** [실행에서 선택한 근거와 단위·조건을 연결해 해석하고, 판단이 바뀌었는지와 남은 불확실성을 쓰세요.]
+
+## 2. 2.8.6: 외식자료에서 분석할 수 있는 질문과 필요한 변수 찾기
+
+```{r}
+#| label: analysis-2
+# 2. 2.8.6: 외식자료에서 분석할 수 있는 질문과 필요한 변수 찾기
+d <- read_data("ch2_data.csv")
+stopifnot(nrow(d)==500,!anyNA(d))
+str(d); print(summary(d))
+export(data.frame(variable=names(d),r_class=sapply(d,class),missing=colSums(is.na(d))),"variable-audit")
+z <- summary_by(d$avg_spend,d$location)
+export(data.frame(location=rownames(z),z,row.names=NULL),"spend-by-location")
+print(table(d$membership,d$satisfaction))
+print(prop.table(table(d$membership,d$satisfaction),margin=1))
+print(summary(aov(avg_spend~factor(location),data=d)))
+cat("visit_time / avg_spend correlation:",cor(d$visit_time,d$avg_spend),"
+")
+picture("variables",1200,800); par(mfrow=c(2,2))
+boxplot(mpg~cyl_group,cars,xlab="Cylinders (groups)",ylab="MPG")
+barplot(table(d$membership),ylab="Rows")
+boxplot(satisfaction~membership,d,ylab="Satisfaction",xlab="Membership")
+plot(d$visit_time,d$avg_spend,xlab="Visit time (min)",ylab="Average spend (KRW)",pch=16,col="#236b6655")
+dev.off()
+```
+
+```{r}
+#| label: tables-2
+#| echo: false
+#| results: asis
+cat("\n\n"); print(knitr::kable(read.csv("output/spend-by-location.csv", check.names=FALSE), digits=4, caption="spend-by-location.csv", row.names=FALSE)); cat("\n\n")
+cat("\n\n"); print(knitr::kable(read.csv("output/variable-audit.csv", check.names=FALSE), digits=4, caption="variable-audit.csv", row.names=FALSE)); cat("\n\n")
+```
+
+```{r}
+#| label: figures-2
+#| echo: false
+#| out-width: 100%
+knitr::include_graphics(c("output/variables.png"))
+```
+
+**판단 질문:** 분포·교차표·평균 비교 중 연구질문에 맞는 방법을 고르고, 이 표만으로 원인을 설명할 수 있는지 쓰세요.
+
+**학생 작성:** [실행에서 선택한 근거와 단위·조건을 연결해 해석하고, 판단이 바뀌었는지와 남은 불확실성을 쓰세요.]
+
+## 3. 심화: 전체에서 VIP가 차지하는 비율과 VIP 중 4점 이상 비율은 다릅니다.
+
+```{r}
+#| label: analysis-3
+# 3. 심화: 전체에서 VIP가 차지하는 비율과 VIP 중 4점 이상 비율은 다릅니다.
+export(data.frame(question=c("VIP share of all rows","Score >= 4 among VIP"),numerator=c(sum(d$membership=="VIP"),sum(d$membership=="VIP" & d$satisfaction>=4)),denominator=c(nrow(d),sum(d$membership=="VIP"))),"denominators")
+```
+
+```{r}
+#| label: tables-3
+#| echo: false
+#| results: asis
+cat("\n\n"); print(knitr::kable(read.csv("output/denominators.csv", check.names=FALSE), digits=4, caption="denominators.csv", row.names=FALSE)); cat("\n\n")
+```
+
+**판단 질문:** 조건부 비율의 분모를 명시하고 두 비율이 답하는 질문을 구분하세요.
+
+**학생 작성:** [실행에서 선택한 근거와 단위·조건을 연결해 해석하고, 판단이 바뀌었는지와 남은 불확실성을 쓰세요.]
+
+# 결과 해석
+
+[핵심 결과 두 가지를 수치·단위·조건과 함께 설명하세요. 통계적 근거와 실무적 의미, 자료에서 말할 수 없는 주장을 구분하세요.]
+
+# 진단과 강건성
+
+[코드에서 실제로 확인한 진단 또는 민감도 비교를 적고, 확인하지 않은 가정과 추가 검증 방법을 쓰세요. 결과 때문에 선택을 바꿀지 판단하세요.]
+
+# 결론
+
+## 무엇을 발견했는가?
+
+[실행 결과를 근거로 2~3문장]
+
+## 그래서 무엇을 해야 하는가?
+
+[실행 또는 보류 판단, 적용 조건과 확인할 지표]
+
+## 무엇을 아직 모르는가?
+
+[추가 자료와 검증 과제]
+
+첫 페이지로 돌아가 핵심 근거와 권고를 직접 작성하세요.
+
+# 재현성 체크리스트
+
+- [ ] 새 세션에서 번호별 청크를 순서대로 실행했다.
+- [ ] 원자료·행 수·단위·표본 범위를 확인했다.
+- [ ] 방법과 비교 조건의 선택 이유를 썼다.
+- [ ] 해석과 첫 페이지의 숫자가 실제 출력과 일치한다.
+- [ ] 진단·민감도와 적용 한계를 설명했다.
+- [ ] AI의 제안과 직접 검증한 결과를 구분했다.
+
+## AI 사용 기록
+
+[미사용 또는 질문·제안·직접 검증·수정 사항]
+
+# Appendix A. 마지막 심화 실습 {.unnumbered}
+
+심화 — 분모를 바꾸면 답도 바뀐다
+전체 500행 중 VIP의 비율과 VIP 중 만족도 4점 이상의 비율을 각각 계산합니다. “VIP가 많다”와 “VIP의 만족도가 높다”를 구분하세요. 이어 회원유형별 만족도 분포를 다시 보고, 같은 평균이라도 분포가 다를 수 있는 상황을 직접 설명합니다. 표본 편향을 줄이기 위해 다음 조사에 누구를 더 포함할지 제안하세요.
+
+[추가 계산, 판단의 변화와 한계를 작성하세요.]
+
+# Appendix B. 실행 환경 {.unnumbered}
+
+처음 한 번 `install.packages(c("knitr", "rmarkdown"))`로 패키지를 준비합니다. ZIP을 풀고 QMD·data·styles.css·pagebreak.lua·reference.docx를 같은 폴더에 둡니다. 별도 analysis.R 없이 실행합니다. 캐시와 freeze는 사용하지 않습니다.
+
+```bash
+quarto render report-template.qmd --to html
+quarto render report-template.qmd --to docx
+quarto render report-template.qmd --to pdf
+```
+
+PDF에는 한국어 LaTeX 환경이 필요합니다. 공식 제출은 집현캠퍼스 안내를 따릅니다.
+
+```{r}
+#| label: session-info
+#| echo: false
+sessionInfo()
+```
