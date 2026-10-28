@@ -1,0 +1,11 @@
+﻿file,column,rows,missing,nature
+mediation.csv,ad_exposure,300,0,해당 장 공개 R 생성식 재현 (가상자료)
+mediation.csv,attitude,300,0,해당 장 공개 R 생성식 재현 (가상자료)
+mediation.csv,purchase_amount,300,0,해당 장 공개 R 생성식 재현 (가상자료)
+moderated-mediation.csv,ad_exposure,300,0,해당 장 공개 R 생성식 재현 (가상자료)
+moderated-mediation.csv,age,300,0,해당 장 공개 R 생성식 재현 (가상자료)
+moderated-mediation.csv,attitude,300,0,해당 장 공개 R 생성식 재현 (가상자료)
+moderated-mediation.csv,purchase_amount,300,0,해당 장 공개 R 생성식 재현 (가상자료)
+moderation.csv,ad_exposure,300,0,해당 장 공개 R 생성식 재현 (가상자료)
+moderation.csv,age,300,0,해당 장 공개 R 생성식 재현 (가상자료)
+moderation.csv,purchase_amount,300,0,해당 장 공개 R 생성식 재현 (가상자료)

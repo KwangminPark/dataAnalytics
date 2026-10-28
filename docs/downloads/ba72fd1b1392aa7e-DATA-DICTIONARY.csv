@@ -1,0 +1,12 @@
+﻿file,column,rows,missing,nature
+ch10_data1.csv,id,500,0,교수 제공 data.zip 원본 (값·바이트 보존)
+ch10_data1.csv,visit_freq,500,0,교수 제공 data.zip 원본 (값·바이트 보존)
+ch10_data1.csv,avg_spend,500,0,교수 제공 data.zip 원본 (값·바이트 보존)
+ch10_data1.csv,day_pref,500,0,교수 제공 data.zip 원본 (값·바이트 보존)
+ch10_data1.csv,menu_pref,500,0,교수 제공 data.zip 원본 (값·바이트 보존)
+chapter10-customers.csv,purchase_amount,500,0,해당 장 공개 R 생성식 재현 (가상자료)
+chapter10-customers.csv,visit_frequency,500,0,해당 장 공개 R 생성식 재현 (가상자료)
+chapter10-customers.csv,satisfaction,500,0,해당 장 공개 R 생성식 재현 (가상자료)
+chapter10-customers.csv,weekday_visit_ratio,500,0,해당 장 공개 R 생성식 재현 (가상자료)
+chapter10-customers.csv,promotion_response,500,0,해당 장 공개 R 생성식 재현 (가상자료)
+chapter10-customers.csv,customer_id,500,0,해당 장 공개 R 생성식 재현 (가상자료)

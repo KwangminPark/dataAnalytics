@@ -1,0 +1,22 @@
+               term    estimate         se            p         low        high
+1       (Intercept) 17.11980659 0.70327202 1.249867e-72 15.73575972 18.50385347
+2       ad_exposure  1.46395856 0.12946786 7.001036e-25  1.20916441  1.71875270
+3             age_c  0.06975455 0.07721262 3.670436e-01 -0.08220071  0.22170981
+4 ad_exposure:age_c -0.04958498 0.01302988 1.719843e-04 -0.07522793 -0.02394203
+  age     slope
+1  20 2.1986427
+2  40 1.2069431
+3  60 0.2152435
+null device 
+          1 
+             path  estimate       low      high
+a               a 0.7923282 0.7327040 0.8525843
+b               b 1.8878964 1.6626523 2.1096400
+direct     direct 0.4921761 0.2994082 0.6852011
+indirect indirect 1.4958335 1.2849056 1.7033745
+total       total 1.9880096 1.8327015 2.1364958
+  age    indirect
+1  20  0.87269827
+2  40 -0.05923637
+3  60 -0.99117101
+Simulated structural relations; regressions on observational data alone do not establish causal mediation.

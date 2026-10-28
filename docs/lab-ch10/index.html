@@ -1,0 +1,337 @@
+<!DOCTYPE html><html lang="ko"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width"><title>10장 LAB · 같은 고객도 묶는 방법에 따라 달라질까? · 외식빅데이터애널리틱스</title><meta name="description" content="질문에서 데이터 분석, 해석과 작업 기록까지 이어지는 수업 실습"><style>:root{color:#18342e;background:#faf9f5;font-family:system-ui,-apple-system,Segoe UI,sans-serif;font-size:16px;line-height:1.75}*{box-sizing:border-box}body{margin:0}a{color:#075f52;text-underline-offset:4px}a:hover{color:#a24d22}header{background:#fff;border-bottom:1px solid #d8ded5;justify-content:space-between;align-items:center;gap:2rem;padding:1.2rem max(5vw,1rem);display:flex}nav{flex-wrap:wrap;gap:1.3rem;display:flex}.brand{font-size:1.15rem;font-weight:800;text-decoration:none}main{max-width:1240px;margin:auto;padding:3rem 2rem}h1{letter-spacing:-.055em;max-width:950px;font-size:clamp(2rem,4vw,3.6rem);line-height:1.2}h2{letter-spacing:-.025em;line-height:1.4}h3{line-height:1.4}p{max-width:76ch}button,.button{font:inherit;cursor:pointer;color:#fff;background:#176654;border:1px solid #176654;border-radius:6px;padding:.55rem 1rem;text-decoration:none;display:inline-block}button:focus-visible,a:focus-visible,summary:focus-visible{outline-offset:4px;outline:3px solid #c47728}.eyebrow{letter-spacing:.12em;color:#577062;font-size:.8rem;font-weight:700}.lead{color:#526259;font-size:1.2rem}.cards{grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:1rem;display:grid}.card{color:inherit;background:#fff;border:1px solid #d8ded5;border-radius:10px;padding:1.5rem;text-decoration:none;display:block}.card:hover{border-color:#176654}.card h3{font-size:1.3rem}.layout{grid-template-columns:210px minmax(0,1fr);gap:3rem;display:grid}.steps{align-self:start;position:sticky;top:1rem}.steps a{padding:.35rem 0;display:block}.lesson{min-width:0}.lesson section{border-top:1px solid #d8ded5;padding:1.4rem 0;scroll-margin-top:1rem}.lesson h2{font-size:1.65rem}.prose{white-space:pre-wrap;overflow-wrap:anywhere}.rich{overflow-x:auto}.rich p{white-space:normal}pre{color:#f3f6ee;tab-size:2;background:#18342e;border-radius:8px;max-width:100%;padding:1.2rem;font-size:.9rem;overflow:auto}code{font-family:ui-monospace,monospace}.file{overflow-wrap:anywhere;margin:.6rem 0;display:block}.file small{color:#526259;display:block}figure{margin:1.5rem 0}img{border-radius:8px;max-width:100%;height:auto}figcaption{color:#526259;overflow-wrap:anywhere;font-size:.9rem}table{border-collapse:collapse;max-width:100%;display:block;overflow:auto}th,td{border:1px solid #bcc8bd;padding:.5rem}details{background:#f0eee5;border-radius:8px;padding:1rem}summary{cursor:pointer;font-weight:650}.quiz-options{gap:.5rem;display:grid}.quiz-options button{color:#18342e;text-align:left;background:#fff}.quiz-result{font-weight:650}.skip{position:absolute;left:-9999px}.skip:focus{z-index:2;background:#fff;padding:1rem;left:1rem}footer{text-align:center;color:#526259;border-top:1px solid #d8ded5;padding:2rem;font-size:.85rem}.empty{padding:4rem 0}.home-section{margin:3rem 0}@media (width<=768px){header{flex-direction:column;align-items:flex-start;gap:.7rem}main{padding:2rem 1rem}.layout{grid-template-columns:1fr;gap:1rem}.steps{border-bottom:1px solid #d8ded5;padding-bottom:1rem;position:static}.steps a{margin-right:1rem;display:inline-block}nav{gap:.6rem 1rem;font-size:.9rem}}@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style></head><body><a class="skip" href="#main">본문으로 이동</a><header><a class="brand" href="/dataAnalytics/">외식빅데이터애널리틱스</a><nav aria-label="주 메뉴"><a href="/dataAnalytics/#lesson">수업 실습</a><a href="/dataAnalytics/ai/">AI Tutor</a><a href="/dataAnalytics/ai/#usage">AI 사용량</a><a href="https://ecampus.sejong.ac.kr/course/view.php?id=33538" rel="noopener noreferrer">집현캠퍼스 · 공식 제출</a></nav></header><main id="main"><p><a href="/dataAnalytics/">← 수업 실습</a></p><h1>10장 LAB · 같은 고객도 묶는 방법에 따라 달라질까?</h1><p class="lead">매출이 높고 자주 방문하는 고객을 묶고 싶습니다. 그런데 구매금액의 원 단위가 다른 변수를 압도하거나, 연결법 하나가 작은 군집을 만들면 전략도 달라집니다. 군집은 고객에게 원래 붙어 있던 정답이 아닙니다.</p><div class="layout"><aside class="steps" aria-label="실습 단계"><a href="#step-1">먼저 판단할 질문</a><a href="#step-2">교재에서 실습으로</a><a href="#step-3">자료와 한 행의 의미</a><a href="#step-4">준비와 실행</a><a href="#step-5">기본 실습 1 · 거리에 넣을 변수 정하기</a><a href="#step-6">기본 실습 2 · 같은 거리로 네 연결법 비교</a><a href="#step-7">기본 실습 3 · K=3으로 잘라 프로파일 읽기</a><a href="#step-8">기본 실습 4 · 표를 운영 가설로 바꾸기</a><a href="#step-9">실행 코드 · 번호별로 읽고 실행하기</a><a href="#step-10">실제로 실행한 기준 출력</a><a href="#step-11">멈추고 해석하기</a><a href="#step-12">AI와 함께 확인하기</a><a href="#step-13">제출할 분석 기록</a><a href="#step-14">막혔을 때 확인할 순서</a><a href="#step-15">보고서 틀과 검산용 해설</a><a href="#step-16">교재와 자료 출처</a><a href="#step-17">마지막 심화 실습</a></aside><article class="lesson"><section id="step-1"><h2>먼저 판단할 질문</h2><p class="prose">매출이 높고 자주 방문하는 고객을 묶고 싶습니다. 그런데 구매금액의 원 단위가 다른 변수를 압도하거나, 연결법 하나가 작은 군집을 만들면 전략도 달라집니다. 군집은 고객에게 원래 붙어 있던 정답이 아닙니다.</p></section><section id="step-2"><h2>교재에서 실습으로</h2><p class="prose">교재 10장 계층적 군집분석
+10.1~10.5 거리·연결법·표준화, 10.6 프랜차이즈 고객 실습
+선수학습: 3장 산포·표준화, 8~9장 다변량 자료
+권장 시간: 기본 100분 + 심화 30분
+
+1. 표준화·거리·연결법의 역할을 구분한다.
+2. 덴드로그램과 군집별 원단위 평균을 함께 읽는다.
+3. 군집 특성에 맞는 실행 가설과 확인할 지표를 제안한다.</p></section><section id="step-3"><h2>자료와 한 행의 의미</h2><p class="prose">기본은 교재 10.6.2 생성식을 그대로 재현한 chapter10-customers.csv(500행, seed 123)입니다. 구매금액(원), 월 방문빈도, 만족도, 평일방문 비율, 프로모션 반응 비율, customer_id가 있습니다. 원문의 정규난수 생성 때문에 만족도에 1~5 밖의 값이 포함됩니다. 원본 생성값을 보존하고 별도 민감도 분석으로만 다룹니다. 교수 ZIP의 ch10_data1.csv는 별개 구조의 500행(id, visit_freq, avg_spend, day_pref, menu_pref)입니다. 이것을 10.6의 다섯 연속변수 데이터인 것처럼 열 이름만 바꾸지 않고, 범주가 섞인 심화 실습에 사용합니다.</p><a class="file" href="/dataAnalytics/downloads/b862299311523c39-ch10_data1.csv" download>ch10_data1.csv ↓<small>17 KB · 교재 10장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter10.html · 교수 제공 data.zip 원본 (값·바이트 보존)</small></a><a class="file" href="/dataAnalytics/downloads/09f66b0e445d72ca-chapter10-customers.csv" download>chapter10-customers.csv ↓<small>39 KB · 교재 10장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter10.html · 해당 장 공개 R 생성식 재현 (가상자료)</small></a><a class="file" href="/dataAnalytics/downloads/ba72fd1b1392aa7e-DATA-DICTIONARY.csv" download>DATA-DICTIONARY.csv ↓<small>2 KB · 교재 10장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter10.html</small></a></section><section id="step-4"><h2>준비와 실행</h2><p class="prose">전체 ZIP을 새 폴더에 풀고 report-template.qmd를 엽니다. 먼저 분석 질문을 적고 문서 안의 번호별 R 청크를 순서대로 실행합니다. 코드와 학생 작성란을 수정한 뒤 quarto render report-template.qmd --to html로 보고서를 생성합니다. data는 덮어쓰지 않고 계산 결과는 output에 저장됩니다. 학생 분석 보고서: 전체 ZIP을 풀고 knitr·rmarkdown을 준비한 뒤 quarto render report-template.qmd --to html을 실행합니다. QMD 안의 번호별 R 청크를 읽고 수정·실행합니다. 표와 그림은 계산되고, 판단·해석은 학생이 직접 작성합니다. 원본 styles.css·pagebreak.lua·reference.docx를 같은 폴더에 둡니다. 학생용은 해석 작성란, 교수자용은 예시 해석을 제공합니다.
+
+기준 출력은 먼저 자신의 결과를 만든 뒤 대조하세요.</p><a class="file" href="/dataAnalytics/downloads/86eee4cb6581e6a9-lab-ch10.zip" download>lab-ch10.zip ↓<small>178 KB · 교재 10장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter10.html</small></a></section><section id="step-5"><h2>기본 실습 1 · 거리에 넣을 변수 정하기</h2><p class="prose">ID를 제외하고 다섯 연속변수의 단위·범위·표준편차를 씁니다. 원 단위 구매금액을 그대로 거리 계산에 넣으면 왜 영향력이 커지는지 설명합니다. 만족도의 범위 밖 값은 지우기 전에 생성식과 출처부터 확인합니다.</p></section><section id="step-6"><h2>기본 실습 2 · 같은 거리로 네 연결법 비교</h2><p class="prose">scale 후 유클리드 거리를 고정하고 single, complete, average, ward.D2를 각각 적합합니다. Ward.D2에는 여기서처럼 유클리드 거리를 사용합니다. 그림에서 언제 큰 가지가 합쳐지는지, 작은 군집 하나가 떨어지는지 관찰합니다.</p></section><section id="step-7"><h2>기본 실습 3 · K=3으로 잘라 프로파일 읽기</h2><p class="prose">교재처럼 Ward 결과를 세 군집으로 잘라 원래 단위의 평균과 고객 수를 구합니다. 높은 구매금액만으로 이름 짓지 말고 방문빈도·만족도·프로모션 반응까지 확인합니다. 1번 군집이라는 번호가 VIP 등급이라는 뜻은 아닙니다.</p></section><section id="step-8"><h2>기본 실습 4 · 표를 운영 가설로 바꾸기</h2><p class="prose">군집마다 실제로 바꿀 수 있는 조치 한 개를 적습니다. 구매가 적은 고객에게 할인 쿠폰을 준다는 제안이라면 할인비용과 쿠폰 없이도 구매했을 가능성을 함께 생각합니다. 군집별 전략은 아직 시험할 가설이며 이탈 여부는 이 자료로 직접 측정하지 않았습니다.</p></section><section id="step-9"><h2>실행 코드 · 번호별로 읽고 실행하기</h2><button type="button" class="copy-code">코드 복사</button><pre><code>---
+title: &quot;10장 · 같은 고객도 묶는 방법에 따라 달라질까? 분석 리포트&quot;
+subtitle: &quot;학생 작성용&quot;
+author:
+  - name: &quot;학번 이름&quot;
+    affiliation: &quot;세종대학교&quot;
+date: today
+lang: ko
+
+format:
+  html:
+    include-in-header:
+      text: |
+        &lt;style&gt;main table{display:block;max-width:100%;overflow-x:auto}main,.cell{min-width:0}h1,h2,h3{overflow-wrap:anywhere}&lt;/style&gt;
+    format-links: false
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    smooth-scroll: true
+    code-fold: true
+    code-tools: true
+    code-copy: true
+    theme:
+      light: cosmo
+      dark: darkly
+    css: styles.css
+    embed-resources: true
+
+  pdf:
+    documentclass: scrartcl
+    toc: true
+    number-sections: true
+    keep-tex: false
+    colorlinks: true
+    geometry:
+      - top=22mm
+      - bottom=22mm
+      - left=24mm
+      - right=24mm
+    include-in-header:
+      text: |
+        \usepackage{kotex}
+        \usepackage{booktabs}
+        \usepackage{longtable}
+        \usepackage{float}
+        \usepackage{xcolor}
+        \definecolor{Accent}{HTML}{17365D}
+        \setkomafont{section}{\color{Accent}\Large\bfseries}
+        \setkomafont{subsection}{\color{Accent}\large\bfseries}
+
+  docx:
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    reference-doc: reference.docx
+
+execute:
+  echo: true
+  warning: true
+  message: false
+  freeze: false
+  cache: false
+  error: false
+
+filters:
+  - pagebreak.lua
+---
+
+
+```{r}
+#| label: setup
+#| include: false
+# 결과를 output 폴더에 저장합니다. 원본 data 파일은 바꾸지 않습니다.
+options(digits=7)
+dir.create(&quot;output&quot;,showWarnings=FALSE)
+read_data &lt;- function(name) read.csv(file.path(&quot;data&quot;,name),fileEncoding=&quot;UTF-8-BOM&quot;,check.names=FALSE,stringsAsFactors=FALSE)
+export &lt;- function(x,name) { print(x); write.csv(x,file.path(&quot;output&quot;,paste0(name,&quot;.csv&quot;)),row.names=FALSE) }
+coef_table &lt;- function(m) { z &lt;- coef(summary(m)); ci &lt;- confint(m); data.frame(term=rownames(z),estimate=z[,1],se=z[,2],p=z[,4],low=ci[,1],high=ci[,2],row.names=NULL) }
+summary_by &lt;- function(x,g) do.call(rbind,lapply(split(x,g),function(y) data.frame(n=length(y),mean=mean(y),median=median(y),sd=sd(y),IQR=IQR(y))))
+picture &lt;- function(name,w=1100,h=720) png(file.path(&quot;output&quot;,paste0(name,&quot;.png&quot;)),width=w,height=h,res=120)
+```
+
+::: {.hero}
+# Executive One-Page Proposal {.unnumbered}
+
+번호별 R 청크를 읽고 실행합니다. 분석을 마친 뒤 핵심 근거를 선택해 첫 페이지를 작성하세요.
+:::
+
+::: {.result-box}
+## 1. Bottom Line {.unnumbered}
+
+[실제 수치·단위·비교 조건을 포함한 핵심 결론 한 문장]
+:::
+
+## 2. Decision / Recommendation {.unnumbered}
+
+1. [실행하거나 보류할 일]
+2. [실행 조건과 추가로 확인할 자료]
+3. [결과를 점검할 지표와 중단 조건]
+
+## 3. Key Evidence {.unnumbered}
+
+| 직접 선택한 핵심 근거 | 실행 결과 | 단위·비교 조건 |
+| --- | --- | --- |
+| [근거 1] | [값] | [조건] |
+| [근거 2] | [값] | [조건] |
+| [근거 3] | [값] | [조건] |
+
+[아래 분석 결과 중 자신의 판단을 뒷받침하는 근거 3~5개를 선택하세요.]
+
+## 4. Managerial / Practical Implication {.unnumbered}
+
+[누구에게 어떤 의미가 있는지, 적용 대상과 범위를 쓰세요.]
+
+## 5. Risk / Limitation {.unnumbered}
+
+[자료·방법·적용 범위의 한계와 말할 수 없는 주장을 쓰세요.]
+
+::: {.pagebreak}
+:::
+
+# 연구문제
+
+매출이 높고 자주 방문하는 고객을 묶고 싶습니다. 그런데 구매금액의 원 단위가 다른 변수를 압도하거나, 연결법 하나가 작은 군집을 만들면 전략도 달라집니다. 군집은 고객에게 원래 붙어 있던 정답이 아닙니다.
+
+**학생 작성:** [연구질문, 실행 전 예상, 판단할 의사결정을 자신의 말로 구체화하세요.]
+
+교재 연결: [계층적 군집분석](https://kwangminpark.github.io/businessAnalytics/Chapter10.html) · 10.1~10.5 거리·연결법·표준화, 10.6 프랜차이즈 고객 실습
+
+# 데이터와 분석 범위
+
+기본은 교재 10.6.2 생성식을 그대로 재현한 chapter10-customers.csv(500행, seed 123)입니다. 구매금액(원), 월 방문빈도, 만족도, 평일방문 비율, 프로모션 반응 비율, customer_id가 있습니다. 원문의 정규난수 생성 때문에 만족도에 1~5 밖의 값이 포함됩니다. 원본 생성값을 보존하고 별도 민감도 분석으로만 다룹니다. 교수 ZIP의 ch10_data1.csv는 별개 구조의 500행(id, visit_freq, avg_spend, day_pref, menu_pref)입니다. 이것을 10.6의 다섯 연속변수 데이터인 것처럼 열 이름만 바꾸지 않고, 범주가 섞인 심화 실습에 사용합니다.
+
+**학생 작성:** [한 행의 의미, 변수 단위, 표본 범위와 추가 점검 사항을 쓰세요.]
+
+자료 이력은 source-provenance.txt, 열 정보는 DATA-DICTIONARY.csv에서 확인합니다.
+
+# 번호별 분석 코드 · 읽고 실행하기
+
+코드와 선택 조건을 QMD 안에서 수정합니다. 계산은 output에 저장되며 원자료는 덮어쓰지 않습니다. 검산용 reference-output은 실행 입력으로 사용하지 않습니다.
+
+## 1. 10.6.2의 생성 자료. customer_id는 거리 계산에서 제외합니다.
+
+```{r}
+#| label: analysis-1
+# 1. 10.6.2의 생성 자료. customer_id는 거리 계산에서 제외합니다.
+d &lt;- read_data(&quot;chapter10-customers.csv&quot;)
+vars &lt;- c(&quot;purchase_amount&quot;,&quot;visit_frequency&quot;,&quot;satisfaction&quot;,&quot;weekday_visit_ratio&quot;,&quot;promotion_response&quot;)
+x &lt;- d[vars]; stopifnot(nrow(x)==500,!anyNA(x))
+export(data.frame(variable=vars,min=sapply(x,min),max=sapply(x,max),sd=sapply(x,sd)),&quot;range-audit&quot;)
+cat(&quot;Satisfaction outside 1..5:&quot;,sum(x$satisfaction&lt;1 | x$satisfaction&gt;5),&quot;
+&quot;)
+z &lt;- scale(x); distances &lt;- dist(z)
+```
+
+```{r}
+#| label: tables-1
+#| echo: false
+#| results: asis
+cat(&quot;\n\n&quot;); print(knitr::kable(read.csv(&quot;output/range-audit.csv&quot;, check.names=FALSE), digits=4, caption=&quot;range-audit.csv&quot;, row.names=FALSE)); cat(&quot;\n\n&quot;)
+```
+
+**판단 질문:** 거리 계산에서 ID를 제외하는 이유와 척도·범위 문제를 설명하세요.
+
+**학생 작성:** [실행에서 선택한 근거와 단위·조건을 연결해 해석하고, 판단이 바뀌었는지와 남은 불확실성을 쓰세요.]
+
+## 2. 같은 표준화/거리에서 연결법만 바꿉니다.
+
+```{r}
+#| label: analysis-2
+# 2. 같은 표준화/거리에서 연결법만 바꿉니다.
+methods &lt;- c(&quot;single&quot;,&quot;complete&quot;,&quot;average&quot;,&quot;ward.D2&quot;)
+fits &lt;- setNames(lapply(methods,function(m) hclust(distances,method=m)),methods)
+picture(&quot;dendrograms&quot;,1200,850); par(mfrow=c(2,2))
+for(m in methods) plot(fits[[m]],labels=FALSE,main=m,xlab=&quot;Customers&quot;,sub=&quot;&quot;,cex=.5)
+dev.off()
+metrics &lt;- do.call(rbind,lapply(methods,function(m) { g &lt;- cutree(fits[[m]],k=3); data.frame(method=m,min_n=min(table(g)),max_n=max(table(g)),silhouette=mean(cluster::silhouette(g,distances)[,3])) }))
+export(metrics,&quot;linkage-comparison&quot;)
+g &lt;- cutree(fits[[&quot;ward.D2&quot;]],k=3)
+profile &lt;- aggregate(x,list(cluster=g),mean); profile$n &lt;- as.integer(table(g))
+export(profile,&quot;ward-profile&quot;)
+```
+
+```{r}
+#| label: tables-2
+#| echo: false
+#| results: asis
+cat(&quot;\n\n&quot;); print(knitr::kable(read.csv(&quot;output/linkage-comparison.csv&quot;, check.names=FALSE), digits=4, caption=&quot;linkage-comparison.csv&quot;, row.names=FALSE)); cat(&quot;\n\n&quot;)
+cat(&quot;\n\n&quot;); print(knitr::kable(read.csv(&quot;output/ward-profile.csv&quot;, check.names=FALSE), digits=4, caption=&quot;ward-profile.csv&quot;, row.names=FALSE)); cat(&quot;\n\n&quot;)
+```
+
+```{r}
+#| label: figures-2
+#| echo: false
+#| out-width: 100%
+knitr::include_graphics(c(&quot;output/dendrograms.png&quot;))
+```
+
+**판단 질문:** 같은 거리에서 연결법을 비교하고 실루엣과 군집 프로필을 근거로 선택하세요.
+
+**학생 작성:** [실행에서 선택한 근거와 단위·조건을 연결해 해석하고, 판단이 바뀌었는지와 남은 불확실성을 쓰세요.]
+
+## 3. 심화: 생성식 범위 문제를 감춘 채 삭제하지 않고 민감도를 확인
+
+```{r}
+#| label: analysis-3
+# 3. 심화: 생성식 범위 문제를 감춘 채 삭제하지 않고 민감도를 확인
+clipped &lt;- x; clipped$satisfaction &lt;- pmin(5,pmax(1,clipped$satisfaction))
+g2 &lt;- cutree(hclust(dist(scale(clipped)),method=&quot;ward.D2&quot;),3)
+export(as.data.frame(table(original=g,clipped=g2)),&quot;range-sensitivity&quot;)
+cat(&quot;Cluster numbers are labels, not customer ranks. Original data remain unchanged.
+&quot;)
+```
+
+```{r}
+#| label: tables-3
+#| echo: false
+#| results: asis
+cat(&quot;\n\n&quot;); print(knitr::kable(read.csv(&quot;output/range-sensitivity.csv&quot;, check.names=FALSE), digits=4, caption=&quot;range-sensitivity.csv&quot;, row.names=FALSE)); cat(&quot;\n\n&quot;)
+```
+
+**판단 질문:** 범위를 보정한 자료와 원자료의 차이를 비교하고 보정의 정당성과 민감도를 판단하세요.
+
+**학생 작성:** [실행에서 선택한 근거와 단위·조건을 연결해 해석하고, 판단이 바뀌었는지와 남은 불확실성을 쓰세요.]
+
+## 4. 교수 제공 혼합형 자료: 연속값 + 범주형, Gower 거리로 비교
+
+```{r}
+#| label: analysis-4
+# 4. 교수 제공 혼합형 자료: 연속값 + 범주형, Gower 거리로 비교
+mixed &lt;- read_data(&quot;ch10_data1.csv&quot;)
+stopifnot(nrow(mixed)==500,!anyNA(mixed),!anyDuplicated(mixed$id))
+mixed$day_pref &lt;- factor(mixed$day_pref)
+mixed$menu_pref &lt;- factor(mixed$menu_pref)
+gower &lt;- cluster::daisy(mixed[c(&quot;visit_freq&quot;,&quot;avg_spend&quot;,&quot;day_pref&quot;,&quot;menu_pref&quot;)],metric=&quot;gower&quot;)
+gm &lt;- cutree(hclust(gower,method=&quot;complete&quot;),k=3)
+export(aggregate(mixed[c(&quot;visit_freq&quot;,&quot;avg_spend&quot;)],list(cluster=gm),mean),&quot;mixed-profile&quot;)
+export(as.data.frame(table(cluster=gm,day=mixed$day_pref)),&quot;mixed-day&quot;)
+export(as.data.frame(table(cluster=gm,menu=mixed$menu_pref)),&quot;mixed-menu&quot;)
+```
+
+```{r}
+#| label: tables-4
+#| echo: false
+#| results: asis
+cat(&quot;\n\n&quot;); print(knitr::kable(read.csv(&quot;output/mixed-day.csv&quot;, check.names=FALSE), digits=4, caption=&quot;mixed-day.csv&quot;, row.names=FALSE)); cat(&quot;\n\n&quot;)
+cat(&quot;\n\n&quot;); print(knitr::kable(read.csv(&quot;output/mixed-menu.csv&quot;, check.names=FALSE), digits=4, caption=&quot;mixed-menu.csv&quot;, row.names=FALSE)); cat(&quot;\n\n&quot;)
+cat(&quot;\n\n&quot;); print(knitr::kable(read.csv(&quot;output/mixed-profile.csv&quot;, check.names=FALSE), digits=4, caption=&quot;mixed-profile.csv&quot;, row.names=FALSE)); cat(&quot;\n\n&quot;)
+```
+
+**판단 질문:** Gower 거리 선택 이유와 범주형 변수의 의미를 설명하고 군집 이름·운영 제안을 직접 정하세요.
+
+**학생 작성:** [실행에서 선택한 근거와 단위·조건을 연결해 해석하고, 판단이 바뀌었는지와 남은 불확실성을 쓰세요.]
+
+# 결과 해석
+
+[핵심 결과 두 가지를 수치·단위·조건과 함께 설명하세요. 통계적 근거와 실무적 의미, 자료에서 말할 수 없는 주장을 구분하세요.]
+
+# 진단과 강건성
+
+[코드에서 실제로 확인한 진단 또는 민감도 비교를 적고, 확인하지 않은 가정과 추가 검증 방법을 쓰세요. 결과 때문에 선택을 바꿀지 판단하세요.]
+
+# 결론
+
+## 무엇을 발견했는가?
+
+[실행 결과를 근거로 2~3문장]
+
+## 그래서 무엇을 해야 하는가?
+
+[실행 또는 보류 판단, 적용 조건과 확인할 지표]
+
+## 무엇을 아직 모르는가?
+
+[추가 자료와 검증 과제]
+
+첫 페이지로 돌아가 핵심 근거와 권고를 직접 작성하세요.
+
+# 재현성 체크리스트
+
+- [ ] 새 세션에서 번호별 청크를 순서대로 실행했다.
+- [ ] 원자료·행 수·단위·표본 범위를 확인했다.
+- [ ] 방법과 비교 조건의 선택 이유를 썼다.
+- [ ] 해석과 첫 페이지의 숫자가 실제 출력과 일치한다.
+- [ ] 진단·민감도와 적용 한계를 설명했다.
+- [ ] AI의 제안과 직접 검증한 결과를 구분했다.
+
+## AI 사용 기록
+
+[미사용 또는 질문·제안·직접 검증·수정 사항]
+
+# Appendix A. 마지막 심화 실습 {.unnumbered}
+
+심화 — 범주가 섞인 고객도 같은 방식으로 묶을까?
+교수 제공 ch10_data1.csv의 day_pref와 menu_pref를 1·2·3 숫자 크기로 바꾸어 유클리드 거리를 쓰면 어떤 의미가 생길까요? ID를 제외하고 범주형을 factor로 지정해 Gower 거리를 만든 뒤 complete 연결법으로 비교합니다. 이 거리는 혼합형용이며 Ward.D2와 임의로 조합하지 않습니다. 기본 자료와 행 수가 같다고 동일 고객이라고 연결하지 마세요. 별도로 range-sensitivity.csv를 읽어 만족도 범위를 제한했을 때 군집 구성이 얼마나 바뀌는지도 확인합니다.
+
+[추가 계산, 판단의 변화와 한계를 작성하세요.]
+
+# Appendix B. 실행 환경 {.unnumbered}
+
+처음 한 번 `install.packages(c(&quot;knitr&quot;, &quot;rmarkdown&quot;))`로 패키지를 준비합니다. ZIP을 풀고 QMD·data·styles.css·pagebreak.lua·reference.docx를 같은 폴더에 둡니다. 별도 analysis.R 없이 실행합니다. 캐시와 freeze는 사용하지 않습니다.
+
+```bash
+quarto render report-template.qmd --to html
+quarto render report-template.qmd --to docx
+quarto render report-template.qmd --to pdf
+```
+
+PDF에는 한국어 LaTeX 환경이 필요합니다. 공식 제출은 집현캠퍼스 안내를 따릅니다.
+
+```{r}
+#| label: session-info
+#| echo: false
+sessionInfo()
+```
+</code></pre><a class="file" href="/dataAnalytics/downloads/ea57f9144f6402b2-report-template.qmd" download>report-template.qmd ↓<small>13 KB · 교재 10장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter10.html</small></a></section><section id="step-10"><h2>실제로 실행한 기준 출력</h2><p class="prose">표의 값은 제공된 R 코드 실행 결과입니다. 전체 수치와 그림은 아래 파일 및 ZIP의 reference-output에서 확인합니다. 그림의 글꼴은 운영체제에 따라 달라질 수 있습니다.</p><div class="rich"><table><tr><th><p>method</p></th><th><p>min_n</p></th><th><p>max_n</p></th><th><p>silhouette</p></th></tr><tr><td><p>single</p></td><td><p>1</p></td><td><p>319</p></td><td><p>0.40523</p></td></tr><tr><td><p>complete</p></td><td><p>80</p></td><td><p>240</p></td><td><p>0.39514</p></td></tr><tr><td><p>average</p></td><td><p>144</p></td><td><p>180</p></td><td><p>0.46216</p></td></tr><tr><td><p>ward.D2</p></td><td><p>147</p></td><td><p>180</p></td><td><p>0.46461</p></td></tr></table></div><a class="file" href="/dataAnalytics/downloads/02067ba515bb22aa-range-sensitivity.csv" download>range-sensitivity.csv ↓<small>1 KB · 교재 10장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter10.html</small></a><a class="file" href="/dataAnalytics/downloads/d1e37bd3878f59e9-session-info.txt" download>session-info.txt ↓<small>1 KB · 교재 10장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter10.html</small></a><a class="file" href="/dataAnalytics/downloads/9f0e858f365258e4-range-audit.csv" download>range-audit.csv ↓<small>1 KB · 교재 10장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter10.html</small></a><a class="file" href="/dataAnalytics/downloads/83e820114d3b1b02-mixed-menu.csv" download>mixed-menu.csv ↓<small>1 KB · 교재 10장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter10.html</small></a><figure><img src="/dataAnalytics/downloads/d250eb9fbf3bf4be-dendrograms.png" alt="실제로 실행한 기준 출력"><figcaption>교재 10장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter10.html</figcaption></figure><a class="file" href="/dataAnalytics/downloads/d250eb9fbf3bf4be-dendrograms.png" download>dendrograms.png ↓<small>105 KB · 교재 10장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter10.html</small></a><a class="file" href="/dataAnalytics/downloads/3563b1fa197ed8d8-mixed-day.csv" download>mixed-day.csv ↓<small>1 KB · 교재 10장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter10.html</small></a><a class="file" href="/dataAnalytics/downloads/ca82540658ec79b3-results.txt" download>results.txt ↓<small>2 KB · 교재 10장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter10.html</small></a><a class="file" href="/dataAnalytics/downloads/f2a08b68574bb055-linkage-comparison.csv" download>linkage-comparison.csv ↓<small>1 KB · 교재 10장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter10.html</small></a><a class="file" href="/dataAnalytics/downloads/1bfb8adfd131f954-ward-profile.csv" download>ward-profile.csv ↓<small>1 KB · 교재 10장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter10.html</small></a><a class="file" href="/dataAnalytics/downloads/1c08c811a49372f8-mixed-profile.csv" download>mixed-profile.csv ↓<small>1 KB · 교재 10장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter10.html</small></a></section><section id="step-11"><h2>멈추고 해석하기</h2><p class="prose">작성 질문: 방법 선택 이유, 결과의 조건·단위, 진단에 따른 판단 변경, 결론의 적용 범위와 한계를 자신의 말로 쓰세요.</p></section><section id="step-12"><h2>AI와 함께 확인하기</h2><p class="prose">“동일 고객자료를 표준화한 뒤 네 연결법을 비교했다. 작은 군집과 군집별 평균을 근거로 해석해줘. 군집번호를 고객 등급으로 부르지 말고, 측정하지 않은 이탈이나 충성도를 단정하지 마.”
+
+질문·제안받은 코드·직접 검증한 결과·수정한 해석을 구분해 기록합니다. AI 접속 없이도 제공된 코드와 설명으로 실습을 마칠 수 있습니다.</p></section><section id="step-13"><h2>제출할 분석 기록</h2><p class="prose">거리 변수 선택 이유, 네 덴드로그램, Ward 원단위 프로파일, 다른 연결법과 비교해 유지/보류한 판단, 군집별 시험할 조치를 제출합니다.
+
+질문→자료→방법→근거→실행/보류 판단을 연결합니다. 공식 제출은 집현캠퍼스 안내를 따릅니다. 마감일·배점은 이 자료에서 정하지 않습니다.
+
+스스로 확인: ID와 군집번호를 거리 변수로 넣지 않았는가? 원단위와 표준화 단위를 구별했는가?</p></section><section id="step-14"><h2>막혔을 때 확인할 순서</h2><details><summary>오류와 확인 순서 펼치기</summary><p class="prose">파일 오류: getwd()와 list.files(&quot;data&quot;) 확인 → ZIP 압축 해제 → 작업 폴더 확인.
+열 이름 오류: names()와 원본 UTF-8 인코딩 확인.
+stopifnot 실패: 행 수·결측·범위 확인. 검사를 지워서 통과시키지 않기.
+값 차이: 원본 파일 → 분석 대상/기준범주 → 시드 → R/패키지 버전 순서로 비교.</p></details><p><a class="button" href="/dataAnalytics/ai/?lab=lab-ch10">AI Tutor에게 질문하기</a></p></section><section id="step-15"><h2>보고서 틀과 검산용 해설</h2><p class="prose">report-template.qmd에 자신의 판단을 씁니다. reference-report.qmd는 기준 해석입니다. 학생 분석 보고서: 전체 ZIP을 풀고 knitr·rmarkdown을 준비한 뒤 quarto render report-template.qmd --to html을 실행합니다. QMD 안의 번호별 R 청크를 읽고 수정·실행합니다. 표와 그림은 계산되고, 판단·해석은 학생이 직접 작성합니다. 원본 styles.css·pagebreak.lua·reference.docx를 같은 폴더에 둡니다. 학생용은 해석 작성란, 교수자용은 예시 해석을 제공합니다.</p><a class="file" href="/dataAnalytics/downloads/ea57f9144f6402b2-report-template.qmd" download>report-template.qmd ↓<small>13 KB · 교재 10장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter10.html</small></a><a class="file" href="/dataAnalytics/downloads/5d894cdd961fcfcb-reference-report.qmd" download>reference-report.qmd ↓<small>14 KB · 교재 10장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter10.html</small></a><a class="file" href="/dataAnalytics/downloads/781e4a98fde96f48-README.md" download>README.md ↓<small>9 KB · 교재 10장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter10.html</small></a></section><section id="step-16"><h2>교재와 자료 출처</h2><p class="prose">교재 10장 실습 · 박광민 · https://kwangminpark.github.io/businessAnalytics/Chapter10.html
+교수 제공 원본, 공개 생성식 재현, 내장자료는 장별 데이터 설명과 ZIP의 source-provenance.txt에 구분했습니다.</p></section><section id="step-17"><h2>마지막 심화 실습</h2><p class="prose">심화 — 범주가 섞인 고객도 같은 방식으로 묶을까?
+교수 제공 ch10_data1.csv의 day_pref와 menu_pref를 1·2·3 숫자 크기로 바꾸어 유클리드 거리를 쓰면 어떤 의미가 생길까요? ID를 제외하고 범주형을 factor로 지정해 Gower 거리를 만든 뒤 complete 연결법으로 비교합니다. 이 거리는 혼합형용이며 Ward.D2와 임의로 조합하지 않습니다. 기본 자료와 행 수가 같다고 동일 고객이라고 연결하지 마세요. 별도로 range-sensitivity.csv를 읽어 만족도 범위를 제한했을 때 군집 구성이 얼마나 바뀌는지도 확인합니다.</p></section><section><h2>출처와 다음 행동</h2><p><a href="https://kwangminpark.github.io/businessAnalytics/Chapter10.html" rel="noopener noreferrer">교재 10장 · 계층적 군집분석</a></p><p>실행한 코드와 결과, 결과를 설명하는 README를 자신의 분석 프로젝트에 기록하세요. 공식 제출은 집현캠퍼스의 안내를 따르세요.</p></section></article></div></main><footer>공식 제출·평가는 집현캠퍼스에서 진행합니다. 이 사이트의 자기점검은 학습용입니다.</footer></body></html><script type="module">document.querySelectorAll(`.copy-code`).forEach(e=>e.addEventListener(`click`,async()=>{try{await navigator.clipboard.writeText(e.nextElementSibling?.textContent||``),e.textContent=`복사됨`}catch{e.textContent=`코드를 선택해서 복사하세요`}})),document.querySelectorAll(`.quiz`).forEach(e=>e.querySelectorAll(`button`).forEach(t=>t.addEventListener(`click`,()=>{e.querySelector(`.quiz-result`).textContent=t.dataset.option===e.dataset.answer?`맞습니다. 본문의 해석과 근거를 다시 연결해 보세요.`:`다시 생각해 보세요. 본문의 조건과 해석을 확인하세요.`})));</script>

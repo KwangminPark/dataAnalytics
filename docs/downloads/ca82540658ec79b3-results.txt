@@ -1,0 +1,51 @@
+                               variable          min          max           sd
+purchase_amount         purchase_amount 2472.4873997 2.972312e+04 6358.6515595
+visit_frequency         visit_frequency    0.0000000 2.300000e+01    4.9117629
+satisfaction               satisfaction    0.6876032 5.231401e+00    0.9579602
+weekday_visit_ratio weekday_visit_ratio    0.1039055 8.996648e-01    0.2173854
+promotion_response   promotion_response    0.1008555 8.998096e-01    0.2328779
+Satisfaction outside 1..5: 9 
+null device 
+          1 
+    method min_n max_n silhouette
+1   single     1   319  0.4052256
+2 complete    80   240  0.3951428
+3  average   144   180  0.4621601
+4  ward.D2   147   180  0.4646142
+  cluster purchase_amount visit_frequency satisfaction weekday_visit_ratio
+1       1       20015.951       11.972222     4.461558           0.7436301
+2       2        9854.852        5.826590     3.498053           0.4467026
+3       3        5982.710        1.972789     2.404317           0.2563395
+  promotion_response   n
+1          0.7053996 180
+2          0.3419547 173
+3          0.2005687 147
+  original clipped Freq
+1        1       1  180
+2        2       1    0
+3        3       1    0
+4        1       2    0
+5        2       2  173
+6        3       2    0
+7        1       3    0
+8        2       3    0
+9        3       3  147
+Cluster numbers are labels, not customer ranks. Original data remain unchanged.
+  cluster visit_freq avg_spend
+1       1  11.061224 14442.583
+2       2   7.736196 11310.712
+3       3   3.478947  6929.171
+  cluster     day Freq
+1       1 weekday    0
+2       2 weekday  163
+3       3 weekday  141
+4       1 weekend  147
+5       2 weekend    0
+6       3 weekend   49
+  cluster    menu Freq
+1       1  coffee   16
+2       2  coffee   11
+3       3  coffee  190
+4       1 dessert  131
+5       2 dessert  152
+6       3 dessert    0
